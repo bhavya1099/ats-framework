@@ -238,7 +238,7 @@ public class FileSystemVerification extends VerificationSkeleton {
 
     /**
      * Add rule to check that the size of the received file is different
-     * than the size of the source file
+     * from the size of the source file
      *
      * @param srcAtsAgent       the remote ATS agent address on which the source file is located
      * @param srcFile           the full name of the file
@@ -265,10 +265,9 @@ public class FileSystemVerification extends VerificationSkeleton {
     }
 
     /**
-     * Add rule to check that the size of the received file is different
-     * than the given one
+     * Add rule to check that the size of the received file is different from the given one
      *
-     * @param size
+     * @param size the threshold
      */
     @PublicAtsApi
     public void checkSizeDifferent( long size ) {
@@ -281,7 +280,7 @@ public class FileSystemVerification extends VerificationSkeleton {
      * Add rule to check that the size of the received file is not less
      * than the given one
      *
-     * @param size
+     * @param size the threshold
      */
     @PublicAtsApi
     public void checkSizeAtLeast( long size ) {
@@ -291,28 +290,26 @@ public class FileSystemVerification extends VerificationSkeleton {
     }
 
     /**
-     * Add rule to check that the size of the received file is less
-     * than the given one
+     * Add rule to check that the size of the received file is less than the given one
      *
-     * @param size
+     * @param size the threshold
      */
     @PublicAtsApi
     public void checkSizeBelow( long size ) {
 
-        FileSizeRule rule = new FileSizeRule(size, "checkSizeBelow", -1, true);
+        FileSizeRule rule = new FileSizeRule(size, "checkSizeBelow", 1, true);
         rootRule.addRule(rule);
     }
 
     /**
-     * Add rule to check that the size of the received file is more
-     * than the given one
+     * Add rule to check that the size of the received file is greater than the given one
      *
-     * @param size
+     * @param size the size threshold. The file should have more byes than provided parameter.
      */
     @PublicAtsApi
     public void checkSizeAbove( long size ) {
 
-        FileSizeRule rule = new FileSizeRule(size, "checkSizeAbove", 1, true);
+        FileSizeRule rule = new FileSizeRule(size, "checkSizeAbove", -1, true);
         rootRule.addRule(rule);
     }
 

@@ -140,7 +140,7 @@ public class FileSizeRule extends AbstractRule {
         if (this.cmp != 0) {
             if (!getExpectedResult())
                 relativeDesc += "not ";
-            relativeDesc += (this.cmp < 0) ? "below" : "above";
+            relativeDesc += (this.cmp < 0) ? "above" : "below";
         } else if (!getExpectedResult()) {
             relativeDesc = "different than";
         }
