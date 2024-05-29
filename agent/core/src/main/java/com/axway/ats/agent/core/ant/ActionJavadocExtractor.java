@@ -64,7 +64,7 @@ public class ActionJavadocExtractor {
 
         List<String> javaFiles = getJavaFiles(new File(sourceFolder));
         for (String javaFile : javaFiles) {
-            extractAtionJavaDoc(new File(javaFile));
+            extractActionJavaDoc(new File(javaFile));
         }
 
         return actionJavadocs;
@@ -109,7 +109,7 @@ public class ActionJavadocExtractor {
      * @param javaFile      the source file for the action class
      * @throws IOException
      */
-    private void extractAtionJavaDoc(
+    private void extractActionJavaDoc(
                                       File javaFile ) throws IOException {
 
         Pattern actionPattern = Pattern.compile(actionAnnotation);
