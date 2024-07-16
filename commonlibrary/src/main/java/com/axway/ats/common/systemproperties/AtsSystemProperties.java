@@ -121,6 +121,8 @@ public class AtsSystemProperties {
      */
     public static final String USER_CURRENT_DIR                                                  = System.getProperty("user.dir");
 
+    public static final String USER_NAME                                                              = System.getProperty("user.name");
+
     /**
      * Specify which monitoring provider to used.<br/>
      * Currently the available once are:<br/>

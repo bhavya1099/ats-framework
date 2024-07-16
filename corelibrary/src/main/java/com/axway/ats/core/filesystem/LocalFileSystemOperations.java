@@ -2089,6 +2089,12 @@ public class LocalFileSystemOperations implements IFileSystemOperations {
             long groupId,
             String filename) {
 
+        // Do not execute command if user is non-root
+        if(!AtsSystemProperties.USER_NAME.equals("root")){
+            log.debug("Current user is non-root and 'chmod' command is not permitted.");
+            return;
+        }
+
         filename = IoUtils.normalizeFilePath(filename, osType);
         String[] command = new String[] { "/bin/sh",
                 "-c",
