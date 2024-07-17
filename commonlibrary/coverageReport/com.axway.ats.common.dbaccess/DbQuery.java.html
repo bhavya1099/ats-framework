@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DbQuery.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ATS-CommonLibrary</a> &gt; <a href="index.source.html" class="el_package">com.axway.ats.common.dbaccess</a> &gt; <span class="el_source">DbQuery.java</span></div><h1>DbQuery.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2017 Axway Software
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.axway.ats.common.dbaccess;
+
+import java.sql.PreparedStatement;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import com.axway.ats.common.PublicAtsApi;
+
+/**
+ * Wrapper, containing all the data needed to build up a {@link PreparedStatement} for the
+ * specific Database Provider.
+ */
+@PublicAtsApi
+public class DbQuery {
+
+<span class="nc" id="L32">	private String query = &quot;&quot;;</span>
+
+<span class="nc" id="L34">	private List&lt;Object&gt; arguments = new ArrayList&lt;Object&gt;();</span>
+
+	/**
+	 * Constructor
+	 * @param q the SQL query to initialize this {@link DbQuery} with
+	 */
+	@PublicAtsApi
+<span class="nc" id="L41">	public DbQuery(String q) {</span>
+
+<span class="nc" id="L43">		this.query = q;</span>
+<span class="nc" id="L44">		this.arguments = new ArrayList&lt;Object&gt;();</span>
+<span class="nc" id="L45">	}</span>
+
+	/**
+	 * Constructor
+	 * @param q the SQL query to initialize this {@link DbQuery} with
+	 * @param args the WHERE arguments to initialize this {@link DbQuery} with
+	 */
+	@PublicAtsApi
+<span class="nc" id="L53">	public DbQuery(String q, List&lt;Object&gt; args) {</span>
+
+<span class="nc bnc" id="L55" title="All 2 branches missed.">		if (args == null) {</span>
+<span class="nc" id="L56">			this.arguments = new ArrayList&lt;Object&gt;();</span>
+		}
+		else {
+<span class="nc" id="L59">			this.arguments = args;</span>
+		}
+
+<span class="nc" id="L62">		this.query = q;</span>
+<span class="nc" id="L63">	}</span>
+
+	/**
+	 * Constructor
+	 * @param q the SQL query to initialize this {@link DbQuery} with
+	 * @param args the WHERE arguments to initialize this {@link DbQuery} with
+	 */
+	@PublicAtsApi
+<span class="nc" id="L71">	public DbQuery(String q, Object[] args) {</span>
+
+<span class="nc" id="L73">		this.arguments = Arrays.asList(args);</span>
+<span class="nc" id="L74">		this.query = q;</span>
+<span class="nc" id="L75">	}</span>
+
+	/**
+	 * @return the SQL query
+	 */
+	public String getQuery() {
+
+<span class="nc" id="L82">		return this.query;</span>
+	}
+
+	/**
+	 * Sets the contents of the query statement
+	 * @param query the new query
+	 */
+	public void setQuery(String query) {
+
+<span class="nc" id="L91">		this.query = query;</span>
+<span class="nc" id="L92">	}</span>
+
+	/**
+	 * @return the {@link List} of arguments for the WHERE clauses (if any)
+	 */
+	public List&lt;Object&gt; getArguments() {
+
+<span class="nc" id="L99">		return this.arguments;</span>
+	}
+
+	/**
+	 * Sets the {@link List} of arguments for the where clauses
+	 * @param arguments the new list of arguments
+	 */
+	public void setArguments(List&lt;Object&gt; arguments) {
+
+<span class="nc" id="L108">		this.arguments = arguments;</span>
+<span class="nc" id="L109">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

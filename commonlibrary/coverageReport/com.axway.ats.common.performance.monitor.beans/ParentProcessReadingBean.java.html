@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ParentProcessReadingBean.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ATS-CommonLibrary</a> &gt; <a href="index.source.html" class="el_package">com.axway.ats.common.performance.monitor.beans</a> &gt; <span class="el_source">ParentProcessReadingBean.java</span></div><h1>ParentProcessReadingBean.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2017 Axway Software
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.axway.ats.common.performance.monitor.beans;
+
+/**
+ * A bean containing info about a virtual process, which acts as a parent of other
+ * processes. It is intended to get a picture of a whole product which is run as many
+ * single processes.
+ */
+public class ParentProcessReadingBean extends ReadingBean {
+
+	private static final long serialVersionUID = 1L;
+
+<span class="nc" id="L27">	private boolean newInstanceFlag = true;</span>
+
+	private String nameOfThisParentProcess;
+
+	private double currentValue;
+
+<span class="nc" id="L33">	private ParentProcessReadingBean() {</span>
+
+<span class="nc" id="L35">	}</span>
+
+	public ParentProcessReadingBean(int dbId, String monitorClass, String nameOfThisParentProcess, String name,
+			String unit) {
+
+<span class="nc" id="L40">		super(monitorClass, name, unit);</span>
+
+<span class="nc" id="L42">		this.dbId = dbId;</span>
+<span class="nc" id="L43">		this.nameOfThisParentProcess = nameOfThisParentProcess;</span>
+<span class="nc" id="L44">	}</span>
+
+	public String getTheNameOfThisParentProcess() {
+
+<span class="nc" id="L48">		return nameOfThisParentProcess;</span>
+	}
+
+	public ParentProcessReadingBean getNewCopy() {
+
+<span class="nc" id="L53">		ParentProcessReadingBean newBean = new ParentProcessReadingBean();</span>
+
+<span class="nc" id="L55">		newBean.value = this.value;</span>
+<span class="nc" id="L56">		newBean.monitorClass = this.monitorClass;</span>
+<span class="nc" id="L57">		newBean.name = this.name;</span>
+<span class="nc" id="L58">		newBean.unit = this.unit;</span>
+<span class="nc" id="L59">		newBean.dbId = this.dbId;</span>
+<span class="nc" id="L60">		newBean.dynamicReading = this.dynamicReading;</span>
+
+		// the parent process bean info
+<span class="nc" id="L63">		newBean.nameOfThisParentProcess = nameOfThisParentProcess;</span>
+
+<span class="nc" id="L65">		return newBean;</span>
+	}
+
+	/**
+	 * @return the current value
+	 */
+	public float poll() {
+
+<span class="nc" id="L73">		return new Float(currentValue).floatValue();</span>
+	}
+
+	/**
+	 * Increment the current value by providing the new value of a child process
+	 * @param newValue
+	 */
+	public void addValue(float newValue) {
+
+		// we filter out negative valuesnewValue
+<span class="nc bnc" id="L83" title="All 2 branches missed.">		if (newValue &gt; 0) {</span>
+<span class="nc" id="L84">			currentValue += newValue;</span>
+		}
+<span class="nc" id="L86">	}</span>
+
+	/**
+	 * We must cleanup the internal value prior to iterating the children processes
+	 */
+	public void resetValue() {
+
+<span class="nc" id="L93">		currentValue = 0;</span>
+<span class="nc" id="L94">	}</span>
+
+	public boolean isNewInstance() {
+
+<span class="nc" id="L98">		return newInstanceFlag;</span>
+	}
+
+	public void setNewInstanceFlag(boolean newInstance) {
+
+<span class="nc" id="L103">		this.newInstanceFlag = newInstance;</span>
+<span class="nc" id="L104">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

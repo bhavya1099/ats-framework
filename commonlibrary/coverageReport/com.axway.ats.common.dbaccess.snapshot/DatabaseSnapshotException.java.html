@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DatabaseSnapshotException.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ATS-CommonLibrary</a> &gt; <a href="index.source.html" class="el_package">com.axway.ats.common.dbaccess.snapshot</a> &gt; <span class="el_source">DatabaseSnapshotException.java</span></div><h1>DatabaseSnapshotException.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2017 Axway Software
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.axway.ats.common.dbaccess.snapshot;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import com.axway.ats.common.PublicAtsApi;
+import com.axway.ats.common.dbaccess.snapshot.equality.DatabaseEqualityState;
+
+/**
+ * Error while working with Database Snapshot
+ */
+@PublicAtsApi
+public class DatabaseSnapshotException extends RuntimeException {
+
+	private static final long serialVersionUID = 1L;
+
+	private DatabaseEqualityState equality;
+
+	public DatabaseSnapshotException(String arg0) {
+
+<span class="nc" id="L37">		super(arg0);</span>
+<span class="nc" id="L38">	}</span>
+
+	public DatabaseSnapshotException(Throwable arg0) {
+
+<span class="nc" id="L42">		super(arg0);</span>
+<span class="nc" id="L43">	}</span>
+
+	public DatabaseSnapshotException(String arg0, Throwable arg1) {
+
+<span class="nc" id="L47">		super(arg0, arg1);</span>
+<span class="nc" id="L48">	}</span>
+
+<span class="nc" id="L50">	public DatabaseSnapshotException(DatabaseEqualityState equality) {</span>
+
+<span class="nc" id="L52">		this.equality = equality;</span>
+<span class="nc" id="L53">	}</span>
+
+	/**
+	 * This can be used to retrieve the compare result and then make some custom compare
+	 * report.
+	 * @return the result of compare
+	 */
+	@PublicAtsApi
+	public DatabaseEqualityState getEqualityState() {
+
+<span class="nc" id="L63">		return this.equality;</span>
+	}
+
+	@Override
+	@PublicAtsApi
+	public String getMessage() {
+
+<span class="nc bnc" id="L70" title="All 2 branches missed.">		if (equality == null) {</span>
+			// got a generic exception, not directly concerning the comparision
+<span class="nc" id="L72">			return super.getMessage();</span>
+		}
+		else {
+<span class="nc" id="L75">			String firstSnapshot = equality.getFirstSnapshotName();</span>
+<span class="nc" id="L76">			String secondSnapshot = equality.getSecondSnapshotName();</span>
+
+<span class="nc" id="L78">			StringBuilder msg = new StringBuilder();</span>
+<span class="nc" id="L79">			msg.append(&quot;Comparing [&quot;);</span>
+<span class="nc" id="L80">			msg.append(firstSnapshot);</span>
+<span class="nc" id="L81">			msg.append(&quot;] and [&quot;);</span>
+<span class="nc" id="L82">			msg.append(secondSnapshot);</span>
+<span class="nc" id="L83">			msg.append(&quot;] produced the following unexpected differences:&quot;);</span>
+
+<span class="nc" id="L85">			addInfoAboutTablesInOneSnapshotOnly(msg, equality, firstSnapshot);</span>
+<span class="nc" id="L86">			addInfoAboutTablesInOneSnapshotOnly(msg, equality, secondSnapshot);</span>
+
+<span class="nc" id="L88">			addInfoAboutDifferentPrimaryKeys(msg, equality, firstSnapshot, secondSnapshot);</span>
+
+<span class="nc" id="L90">			addInfoAboutDifferentNumberOfRows(msg, equality, firstSnapshot, secondSnapshot);</span>
+
+<span class="nc" id="L92">			addInfoAboutColumnsInOneSnapshotOnly(msg, equality, firstSnapshot, secondSnapshot);</span>
+
+<span class="nc" id="L94">			addInfoAboutIndexesInOneSnapshotOnly(msg, equality, firstSnapshot, secondSnapshot);</span>
+
+<span class="nc" id="L96">			addInfoAboutRowsInOneSnapshotOnly(msg, equality, firstSnapshot, secondSnapshot);</span>
+
+<span class="nc" id="L98">			msg.append(&quot;\n&quot;);</span>
+<span class="nc" id="L99">			return msg.toString();</span>
+		}
+	}
+
+	private void addInfoAboutTablesInOneSnapshotOnly(StringBuilder msg, DatabaseEqualityState equality,
+			String snapshot) {
+
+<span class="nc" id="L106">		StringBuilder tablesInOneSnapshotOnly = new StringBuilder();</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">		for (String table : equality.getTablesPresentInOneSnapshotOnly(snapshot)) {</span>
+<span class="nc" id="L108">			tablesInOneSnapshotOnly.append(&quot;\n\t&quot;);</span>
+<span class="nc" id="L109">			tablesInOneSnapshotOnly.append(table);</span>
+<span class="nc" id="L110">		}</span>
+
+<span class="nc bnc" id="L112" title="All 2 branches missed.">		if (tablesInOneSnapshotOnly.length() &gt; 0) {</span>
+<span class="nc" id="L113">			msg.append(&quot;\nTables present in [&quot; + snapshot + &quot;] only:&quot;);</span>
+<span class="nc" id="L114">			msg.append(tablesInOneSnapshotOnly);</span>
+		}
+<span class="nc" id="L116">	}</span>
+
+	private void addInfoAboutDifferentPrimaryKeys(StringBuilder msg, DatabaseEqualityState equality,
+			String firstSnapshot, String secondSnapshot) {
+
+<span class="nc" id="L121">		Set&lt;String&gt; tables = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L122">		tables.addAll(equality.getTablesWithDifferentPrimaryKeys(firstSnapshot));</span>
+<span class="nc" id="L123">		tables.addAll(equality.getTablesWithDifferentPrimaryKeys(secondSnapshot));</span>
+
+<span class="nc bnc" id="L125" title="All 2 branches missed.">		if (tables.size() &gt; 0) {</span>
+<span class="nc" id="L126">			msg.append(&quot;\nDifferent primary keys:&quot;);</span>
+
+<span class="nc bnc" id="L128" title="All 2 branches missed.">			for (String table : tables) {</span>
+<span class="nc" id="L129">				msg.append(&quot;\n\ttable '&quot; + table + &quot;', primary key column in [&quot; + firstSnapshot + &quot;] is '&quot;</span>
+<span class="nc" id="L130">						+ equality.getDifferentPrimaryKeys(firstSnapshot, table) + &quot;', while in [&quot; + secondSnapshot</span>
+<span class="nc" id="L131">						+ &quot;] is '&quot; + equality.getDifferentPrimaryKeys(secondSnapshot, table) + &quot;'&quot;);</span>
+<span class="nc" id="L132">			}</span>
+		}
+<span class="nc" id="L134">	}</span>
+
+	private void addInfoAboutDifferentNumberOfRows(StringBuilder msg, DatabaseEqualityState equality,
+			String firstSnapshot, String secondSnapshot) {
+
+<span class="nc" id="L139">		Set&lt;String&gt; tables = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L140">		tables.addAll(equality.getTablesWithDifferentNumberOfRows(firstSnapshot));</span>
+<span class="nc" id="L141">		tables.addAll(equality.getTablesWithDifferentNumberOfRows(secondSnapshot));</span>
+
+<span class="nc bnc" id="L143" title="All 2 branches missed.">		if (tables.size() &gt; 0) {</span>
+<span class="nc" id="L144">			msg.append(&quot;\nDifferent number of rows&quot; + &quot;:&quot;);</span>
+
+<span class="nc bnc" id="L146" title="All 2 branches missed.">			for (String table : tables) {</span>
+<span class="nc" id="L147">				msg.append(&quot;\n\ttable '&quot; + table + &quot;', &quot; + equality.getDifferentNumberOfRows(firstSnapshot, table)</span>
+						+ &quot; rows in [&quot; + firstSnapshot + &quot;] and &quot;
+<span class="nc" id="L149">						+ equality.getDifferentNumberOfRows(secondSnapshot, table) + &quot; in [&quot; + secondSnapshot + &quot;]&quot;);</span>
+<span class="nc" id="L150">			}</span>
+		}
+<span class="nc" id="L152">	}</span>
+
+	private void addInfoAboutColumnsInOneSnapshotOnly(StringBuilder msg, DatabaseEqualityState equality,
+			String firstSnapshot, String secondSnapshot) {
+
+<span class="nc" id="L157">		Set&lt;String&gt; tables = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L158">		tables.addAll(equality.getTablesWithColumnsPresentInOneSnapshotOnly(firstSnapshot));</span>
+<span class="nc" id="L159">		tables.addAll(equality.getTablesWithColumnsPresentInOneSnapshotOnly(secondSnapshot));</span>
+
+<span class="nc bnc" id="L161" title="All 2 branches missed.">		if (tables.size() &gt; 0) {</span>
+<span class="nc bnc" id="L162" title="All 2 branches missed.">			for (String table : tables) {</span>
+				// add different columns for one table at a time
+<span class="nc" id="L164">				msg.append(&quot;\nTable columns for '&quot; + table + &quot;' table:&quot;);</span>
+
+<span class="nc" id="L166">				List&lt;String&gt; firstColumns = equality.getColumnsPresentInOneSnapshotOnlyAsStrings(firstSnapshot, table);</span>
+<span class="nc bnc" id="L167" title="All 4 branches missed.">				if (firstColumns != null &amp;&amp; firstColumns.size() &gt; 0) {</span>
+<span class="nc" id="L168">					msg.append(&quot;\n\t[&quot; + firstSnapshot + &quot;]:&quot;);</span>
+<span class="nc bnc" id="L169" title="All 2 branches missed.">					for (String column : firstColumns) {</span>
+<span class="nc" id="L170">						msg.append(&quot;\n\t\t&quot; + column);</span>
+<span class="nc" id="L171">					}</span>
+				}
+
+<span class="nc" id="L174">				List&lt;String&gt; secondColumns = equality.getColumnsPresentInOneSnapshotOnlyAsStrings(secondSnapshot,</span>
+						table);
+<span class="nc bnc" id="L176" title="All 4 branches missed.">				if (secondColumns != null &amp;&amp; secondColumns.size() &gt; 0) {</span>
+<span class="nc" id="L177">					msg.append(&quot;\n\t[&quot; + secondSnapshot + &quot;]:&quot;);</span>
+<span class="nc bnc" id="L178" title="All 2 branches missed.">					for (String column : secondColumns) {</span>
+<span class="nc" id="L179">						msg.append(&quot;\n\t\t&quot; + column);</span>
+<span class="nc" id="L180">					}</span>
+				}
+<span class="nc" id="L182">			}</span>
+		}
+<span class="nc" id="L184">	}</span>
+
+	private void addInfoAboutIndexesInOneSnapshotOnly(StringBuilder msg, DatabaseEqualityState equality,
+			String firstSnapshot, String secondSnapshot) {
+
+<span class="nc" id="L189">		Set&lt;String&gt; tables = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L190">		tables.addAll(equality.getTablesWithIndexesPresentInOneSnapshotOnly(firstSnapshot));</span>
+<span class="nc" id="L191">		tables.addAll(equality.getTablesWithIndexesPresentInOneSnapshotOnly(secondSnapshot));</span>
+
+<span class="nc bnc" id="L193" title="All 2 branches missed.">		if (tables.size() &gt; 0) {</span>
+<span class="nc bnc" id="L194" title="All 2 branches missed.">			for (String table : tables) {</span>
+				// add different indexes for one table at a time
+<span class="nc" id="L196">				msg.append(&quot;\nTable indexes for '&quot; + table + &quot;' table:&quot;);</span>
+
+<span class="nc" id="L198">				List&lt;String&gt; firstIndexes = equality.getIndexesPresentInOneSnapshotOnlyAsStrings(firstSnapshot, table);</span>
+<span class="nc" id="L199">				msg.append(&quot;\n\t[&quot; + firstSnapshot + &quot;]:&quot;);</span>
+<span class="nc bnc" id="L200" title="All 2 branches missed.">				for (String index : firstIndexes) {</span>
+<span class="nc" id="L201">					msg.append(&quot;\n\t\t&quot; + index);</span>
+<span class="nc" id="L202">				}</span>
+
+<span class="nc" id="L204">				List&lt;String&gt; secondIndexes = equality.getIndexesPresentInOneSnapshotOnlyAsStrings(secondSnapshot,</span>
+						table);
+<span class="nc" id="L206">				msg.append(&quot;\n\t[&quot; + secondSnapshot + &quot;]:&quot;);</span>
+<span class="nc bnc" id="L207" title="All 2 branches missed.">				for (String index : secondIndexes) {</span>
+<span class="nc" id="L208">					msg.append(&quot;\n\t\t&quot; + index);</span>
+<span class="nc" id="L209">				}</span>
+<span class="nc" id="L210">			}</span>
+		}
+<span class="nc" id="L212">	}</span>
+
+	private void addInfoAboutRowsInOneSnapshotOnly(StringBuilder msg, DatabaseEqualityState equality,
+			String firstSnapshot, String secondSnapshot) {
+
+<span class="nc" id="L217">		Set&lt;String&gt; tables = new HashSet&lt;&gt;();</span>
+<span class="nc" id="L218">		tables.addAll(equality.getTablesWithRowsPresentInOneSnapshotOnly(firstSnapshot));</span>
+<span class="nc" id="L219">		tables.addAll(equality.getTablesWithRowsPresentInOneSnapshotOnly(secondSnapshot));</span>
+
+<span class="nc bnc" id="L221" title="All 2 branches missed.">		if (tables.size() &gt; 0) {</span>
+<span class="nc bnc" id="L222" title="All 2 branches missed.">			for (String table : tables) {</span>
+				// add different rows for one table at a time
+<span class="nc" id="L224">				msg.append(&quot;\nTable rows for '&quot; + table + &quot;' table:&quot;);</span>
+
+<span class="nc" id="L226">				List&lt;String&gt; firstRows = equality.getRowsPresentInOneSnapshotOnlyAsStrings(firstSnapshot, table);</span>
+<span class="nc bnc" id="L227" title="All 4 branches missed.">				if (firstRows != null &amp;&amp; firstRows.size() &gt; 0) {</span>
+<span class="nc" id="L228">					msg.append(&quot;\n\t[&quot; + firstSnapshot + &quot;]:&quot;);</span>
+<span class="nc bnc" id="L229" title="All 2 branches missed.">					for (String row : firstRows) {</span>
+<span class="nc" id="L230">						msg.append(&quot;\n\t\t&quot; + row);</span>
+<span class="nc" id="L231">					}</span>
+				}
+
+<span class="nc" id="L234">				List&lt;String&gt; secondRows = equality.getRowsPresentInOneSnapshotOnlyAsStrings(secondSnapshot, table);</span>
+<span class="nc bnc" id="L235" title="All 4 branches missed.">				if (secondRows != null &amp;&amp; secondRows.size() &gt; 0) {</span>
+<span class="nc" id="L236">					msg.append(&quot;\n\t[&quot; + secondSnapshot + &quot;]:&quot;);</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">					for (String row : secondRows) {</span>
+<span class="nc" id="L238">						msg.append(&quot;\n\t\t&quot; + row);</span>
+<span class="nc" id="L239">					}</span>
+				}
+<span class="nc" id="L241">			}</span>
+		}
+<span class="nc" id="L243">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

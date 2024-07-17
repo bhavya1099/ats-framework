@@ -1,0 +1,728 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TableDescription.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ATS-CommonLibrary</a> &gt; <a href="index.source.html" class="el_package">com.axway.ats.common.dbaccess.snapshot</a> &gt; <span class="el_source">TableDescription.java</span></div><h1>TableDescription.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2017-2020 Axway Software
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.axway.ats.common.dbaccess.snapshot;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
+
+import org.apache.log4j.Logger;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import com.axway.ats.common.dbaccess.snapshot.equality.DatabaseEqualityState;
+import com.axway.ats.common.systemproperties.AtsSystemProperties;
+
+/**
+ * Meta information about a table. Used when comparing databases.
+ */
+public class TableDescription {
+
+	public static final String INDEX_PROPERTIES_DELIMITER = &quot;, &quot;;
+
+<span class="nc" id="L45">	private static Logger log = Logger.getLogger(TableDescription.class);</span>
+
+	// snapshot this table belongs to
+	private String snapshotName;
+
+	// table name
+	private String name;
+
+	// table schema
+	private String schema;
+
+	// primary key column
+<span class="nc" id="L57">	private String primaryKeyColumn = &quot;&quot;;</span>
+
+	// description of all table columns
+	private List&lt;String&gt; columnDescriptions;
+
+	// all table indexes
+	// &lt;index name, index attributes&gt;
+	private Map&lt;String, String&gt; indexes;
+
+<span class="nc" id="L66">	public TableDescription() {</span>
+
+<span class="nc" id="L68">		columnDescriptions = new ArrayList&lt;String&gt;();</span>
+<span class="nc" id="L69">		indexes = new HashMap&lt;&gt;();</span>
+<span class="nc" id="L70">	}</span>
+
+	public String getSnapshotName() {
+
+<span class="nc" id="L74">		return this.snapshotName;</span>
+	}
+
+	public void setSnapshotName(String snapshotName) {
+
+<span class="nc" id="L79">		this.snapshotName = snapshotName;</span>
+<span class="nc" id="L80">	}</span>
+
+	public String getName() {
+
+<span class="nc" id="L84">		return name;</span>
+	}
+
+	public void setName(String name) {
+
+<span class="nc" id="L89">		this.name = name;</span>
+<span class="nc" id="L90">	}</span>
+
+	public String getSchema() {
+
+<span class="nc" id="L94">		return schema;</span>
+	}
+
+	public void setSchema(String schema) {
+
+<span class="nc" id="L99">		this.schema = schema;</span>
+<span class="nc" id="L100">	}</span>
+
+	public String getPrimaryKeyColumn() {
+
+<span class="nc" id="L104">		return primaryKeyColumn;</span>
+	}
+
+	public void setPrimaryKeyColumn(String primaryKeyColumn) {
+
+<span class="nc bnc" id="L109" title="All 2 branches missed.">		if (primaryKeyColumn != null) {</span>
+<span class="nc" id="L110">			this.primaryKeyColumn = primaryKeyColumn;</span>
+		}
+<span class="nc" id="L112">	}</span>
+
+	public Set&lt;String&gt; getColumnNames() {
+
+<span class="nc" id="L116">		Set&lt;String&gt; columns = new HashSet&lt;&gt;();</span>
+<span class="nc bnc" id="L117" title="All 2 branches missed.">		for (String description : columnDescriptions) {</span>
+			// we rely that the column description string starts with 'name=some_column,'
+<span class="nc" id="L119">			columns.add(description.substring(description.indexOf(&quot;=&quot;) + 1, description.indexOf(&quot;,&quot;)));</span>
+<span class="nc" id="L120">		}</span>
+<span class="nc" id="L121">		return columns;</span>
+	}
+
+	public List&lt;String&gt; getColumnDescriptions() {
+
+<span class="nc" id="L126">		return columnDescriptions;</span>
+	}
+
+	public void setColumnDescriptions(List&lt;String&gt; columnDescriptions) {
+
+<span class="nc" id="L131">		this.columnDescriptions = columnDescriptions;</span>
+<span class="nc" id="L132">	}</span>
+
+	public Map&lt;String, String&gt; getIndexes() {
+
+<span class="nc" id="L136">		return indexes;</span>
+	}
+
+	public void setIndexes(Map&lt;String, String&gt; indexes) {
+
+<span class="nc" id="L141">		this.indexes = indexes;</span>
+<span class="nc" id="L142">	}</span>
+
+	/**
+	 * Compares two instances of this table
+	 * @param that THAT instance
+	 * @param thisValuesList the values in THIS instance
+	 * @param thatValuesList the values in THAT instance
+	 * @param equality
+	 */
+	public void compare(TableDescription that, List&lt;String&gt; thisValuesList, List&lt;String&gt; thatValuesList,
+			int thisNumberOfRows, int thatNumberOfRows, IndexMatcher nameComparator, DatabaseEqualityState equality) {
+
+<span class="nc" id="L154">		boolean tablesAreSame = true;</span>
+
+		// check primary key column
+<span class="nc bnc" id="L157" title="All 2 branches missed.">		if (!this.primaryKeyColumn.equalsIgnoreCase(that.primaryKeyColumn)) {</span>
+<span class="nc" id="L158">			tablesAreSame = false;</span>
+<span class="nc" id="L159">			equality.addDifferentPrimaryKeys(this.snapshotName, that.snapshotName, this.primaryKeyColumn,</span>
+					that.primaryKeyColumn, name);
+		}
+
+		// check if indexes are the same
+<span class="nc" id="L164">		checkIndexes(that, nameComparator, equality);</span>
+
+		// check if columns are the same
+<span class="nc" id="L167">		boolean sameColumnNames = checkColumns(that, equality);</span>
+
+		// check the table content only if columns are same or the value lists are not
+		// initialized
+<span class="nc bnc" id="L171" title="All 2 branches missed.">		if (sameColumnNames) {</span>
+<span class="nc bnc" id="L172" title="All 4 branches missed.">			if (thisValuesList != null &amp;&amp; thatValuesList != null) {</span>
+
+				// check the table size
+<span class="nc bnc" id="L175" title="All 2 branches missed.">				if (thisValuesList.size() != thatValuesList.size()) {</span>
+<span class="nc" id="L176">					tablesAreSame = false;</span>
+<span class="nc" id="L177">					equality.addDifferentNumberOfRows(this.snapshotName, that.snapshotName, thisValuesList.size(),</span>
+<span class="nc" id="L178">							thatValuesList.size(), name);</span>
+				}
+
+				// check the table content
+<span class="nc" id="L182">				removeSameRows(thisValuesList, thatValuesList);</span>
+<span class="nc" id="L183">				removeSameRows(thatValuesList, thisValuesList);</span>
+
+				// now if there are left rows, we report them as unexpected
+				// differences
+<span class="nc bnc" id="L187" title="All 2 branches missed.">				for (String row : thisValuesList) {</span>
+<span class="nc" id="L188">					tablesAreSame = false;</span>
+<span class="nc" id="L189">					equality.addRowPresentInOneSnapshotOnly(this.snapshotName, name, row);</span>
+<span class="nc" id="L190">				}</span>
+<span class="nc bnc" id="L191" title="All 2 branches missed.">				for (String row : thatValuesList) {</span>
+<span class="nc" id="L192">					tablesAreSame = false;</span>
+<span class="nc" id="L193">					equality.addRowPresentInOneSnapshotOnly(that.snapshotName, name, row);</span>
+<span class="nc" id="L194">				}</span>
+			}
+		}
+		else {
+<span class="nc" id="L198">			log.warn(&quot;The content of table &quot; + this.name</span>
+					+ &quot; will not be checked because there is at least one column with name not present in both snapshots&quot;);
+		}
+
+<span class="nc bnc" id="L202" title="All 4 branches missed.">		if (thisNumberOfRows != -1 &amp;&amp; thisNumberOfRows != thatNumberOfRows) {</span>
+			// in some unusual cases, the user does not want to check the table content,
+			// but
+			// wants to make sure the number of rows is same
+<span class="nc" id="L206">			equality.addDifferentNumberOfRows(this.snapshotName, that.snapshotName, thisNumberOfRows, thatNumberOfRows,</span>
+					name);
+		}
+
+<span class="nc bnc" id="L210" title="All 2 branches missed.">		if (tablesAreSame) {</span>
+<span class="nc" id="L211">			log.info(&quot;Same table: &quot; + name);</span>
+		}
+<span class="nc" id="L213">	}</span>
+
+	private void removeSameRows(List&lt;String&gt; someRows, List&lt;String&gt; otherRows) {
+
+<span class="nc" id="L217">		Iterator&lt;String&gt; someIt = someRows.iterator();</span>
+<span class="nc bnc" id="L218" title="All 2 branches missed.">		while (someIt.hasNext()) {</span>
+<span class="nc" id="L219">			String someRow = someIt.next();</span>
+
+<span class="nc" id="L221">			Iterator&lt;String&gt; otherIt = otherRows.iterator();</span>
+<span class="nc bnc" id="L222" title="All 2 branches missed.">			while (otherIt.hasNext()) {</span>
+<span class="nc" id="L223">				String otherRow = otherIt.next();</span>
+<span class="nc bnc" id="L224" title="All 2 branches missed.">				if (someRow.equals(otherRow)) {</span>
+<span class="nc" id="L225">					someIt.remove();</span>
+<span class="nc" id="L226">					otherIt.remove();</span>
+<span class="nc" id="L227">					break;</span>
+				}
+<span class="nc" id="L229">			}</span>
+<span class="nc" id="L230">		}</span>
+<span class="nc" id="L231">	}</span>
+
+	private boolean checkColumns(TableDescription that, DatabaseEqualityState equality) {
+
+		// check if all columns from THIS snapshot are present in THAT
+<span class="nc bnc" id="L236" title="All 2 branches missed.">		for (String thisColumnDesc : this.columnDescriptions) {</span>
+<span class="nc bnc" id="L237" title="All 2 branches missed.">			if (!that.columnDescriptions.contains(thisColumnDesc)) {</span>
+<span class="nc" id="L238">				equality.addColumnPresentInOneSnapshotOnly(this.snapshotName, name, thisColumnDesc);</span>
+			}
+<span class="nc" id="L240">		}</span>
+
+		// check if all columns from THAT snapshot are present in THIS
+<span class="nc bnc" id="L243" title="All 2 branches missed.">		for (String thatColumnDesc : that.columnDescriptions) {</span>
+<span class="nc bnc" id="L244" title="All 2 branches missed.">			if (!this.columnDescriptions.contains(thatColumnDesc)) {</span>
+<span class="nc" id="L245">				equality.addColumnPresentInOneSnapshotOnly(that.snapshotName, name, thatColumnDesc);</span>
+			}
+<span class="nc" id="L247">		}</span>
+
+<span class="nc" id="L249">		return allColumnsHaveSameNames(that);</span>
+	}
+
+	/**
+	 * @param that
+	 * @return whether all columns of one table have same names
+	 */
+	private boolean allColumnsHaveSameNames(TableDescription that) {
+
+<span class="nc" id="L258">		Set&lt;String&gt; thisColunmNames = getColumnNames();</span>
+<span class="nc" id="L259">		Set&lt;String&gt; thatColunmNames = that.getColumnNames();</span>
+
+<span class="nc bnc" id="L261" title="All 2 branches missed.">		for (String thisColunmName : thisColunmNames) {</span>
+<span class="nc bnc" id="L262" title="All 2 branches missed.">			if (!thatColunmNames.contains(thisColunmName)) {</span>
+<span class="nc" id="L263">				return false;</span>
+			}
+<span class="nc" id="L265">		}</span>
+
+<span class="nc bnc" id="L267" title="All 2 branches missed.">		for (String thatColunmName : thatColunmNames) {</span>
+<span class="nc bnc" id="L268" title="All 2 branches missed.">			if (!thisColunmNames.contains(thatColunmName)) {</span>
+<span class="nc" id="L269">				return false;</span>
+			}
+<span class="nc" id="L271">		}</span>
+
+<span class="nc" id="L273">		return true;</span>
+	}
+
+	private void checkIndexes(TableDescription that, IndexMatcher nameComparator, DatabaseEqualityState equality) {
+
+<span class="nc" id="L278">		final Set&lt;String&gt; thisNames = this.indexes.keySet();</span>
+<span class="nc" id="L279">		final Set&lt;String&gt; thatNames = that.indexes.keySet();</span>
+
+<span class="nc bnc" id="L281" title="All 2 branches missed.">		if (!thisNames.isEmpty()) {</span>
+
+			// check if all indexes from THIS snapshot are present in THAT
+<span class="nc bnc" id="L284" title="All 2 branches missed.">			for (String thisName : thisNames) {</span>
+<span class="nc" id="L285">				boolean propertiesAlreadyChecked = false;</span>
+<span class="nc" id="L286">				String equivalentThatName = null;</span>
+<span class="nc" id="L287">				Properties thisIndexProperties = toProperties(this.indexes.get(thisName), INDEX_PROPERTIES_DELIMITER);</span>
+<span class="nc" id="L288">				Properties thatIndexProperties = null;</span>
+<span class="nc bnc" id="L289" title="All 2 branches missed.">				for (String thatName : thatNames) {</span>
+
+<span class="nc" id="L291">					thatIndexProperties = toProperties(that.indexes.get(thatName), INDEX_PROPERTIES_DELIMITER);</span>
+
+					// check if both indexes are on the same column in the table
+<span class="nc" id="L294">					String thisIndexColumnName = thisIndexProperties.getProperty(&quot;COLUMN_NAME&quot;);</span>
+<span class="nc bnc" id="L295" title="All 2 branches missed.">					if (thisIndexColumnName == null) {</span>
+<span class="nc" id="L296">						thisIndexColumnName = thisIndexProperties.getProperty(&quot;column_name&quot;);</span>
+<span class="nc bnc" id="L297" title="All 2 branches missed.">						if (thisIndexColumnName == null) {</span>
+<span class="nc" id="L298">							thisIndexColumnName = getIndexColumnNameFromIndexUid(thisName);</span>
+<span class="nc bnc" id="L299" title="All 2 branches missed.">							if (thisIndexColumnName == null) {</span>
+								// log warning
+<span class="nc" id="L301">								logMissingColumnNameWarning(thisName);</span>
+							}
+						}
+					}
+
+<span class="nc" id="L306">					String thatIndexColumnName = thatIndexProperties.getProperty(&quot;COLUMN_NAME&quot;);</span>
+<span class="nc bnc" id="L307" title="All 2 branches missed.">					if (thatIndexColumnName == null) {</span>
+<span class="nc" id="L308">						thatIndexColumnName = thatIndexProperties.getProperty(&quot;column_name&quot;);</span>
+<span class="nc bnc" id="L309" title="All 2 branches missed.">						if (thatIndexColumnName == null) {</span>
+<span class="nc" id="L310">							thatIndexColumnName = getIndexColumnNameFromIndexUid(thatName);</span>
+<span class="nc bnc" id="L311" title="All 2 branches missed.">							if (thatIndexColumnName == null) {</span>
+								// log warning
+<span class="nc" id="L313">								logMissingColumnNameWarning(thatName);</span>
+							}
+						}
+					}
+
+<span class="nc bnc" id="L318" title="All 2 branches missed.">					if (!thisIndexColumnName.equals(thatIndexColumnName)) {</span>
+<span class="nc" id="L319">						continue;</span>
+					}
+
+<span class="nc" id="L322">					String thisIndexName = thisIndexProperties.getProperty(&quot;INDEX_NAME&quot;);</span>
+<span class="nc bnc" id="L323" title="All 2 branches missed.">					if (thisIndexName == null) {</span>
+<span class="nc" id="L324">						thisIndexName = thisIndexProperties.getProperty(&quot;index_name&quot;);</span>
+<span class="nc bnc" id="L325" title="All 2 branches missed.">						if (thisIndexName == null) {</span>
+							// MySQL specific case
+							// thisName = &lt;index uid=&quot;COLUMN_NAME=&lt;some_value&gt;,
+							// INDEX_NAME=&lt;some_value&gt;&quot;&gt;
+<span class="nc" id="L329">							thisIndexName = thisName.split(&quot;, &quot;)[1].split(&quot;=&quot;)[1];</span>
+						}
+					}
+
+<span class="nc" id="L333">					String thatIndexName = thatIndexProperties.getProperty(&quot;INDEX_NAME&quot;);</span>
+<span class="nc bnc" id="L334" title="All 2 branches missed.">					if (thatIndexName == null) {</span>
+<span class="nc" id="L335">						thatIndexName = thatIndexProperties.getProperty(&quot;index_name&quot;);</span>
+<span class="nc bnc" id="L336" title="All 2 branches missed.">						if (thatIndexName == null) {</span>
+							// MySQL specific case
+							// thatName = &lt;index uid=&quot;COLUMN_NAME=&lt;some_value&gt;,
+							// INDEX_NAME=&lt;some_value&gt;&quot;&gt;
+<span class="nc" id="L340">							thatIndexName = thatName.split(INDEX_PROPERTIES_DELIMITER)[1].split(&quot;=&quot;)[1];</span>
+						}
+					}
+
+<span class="nc bnc" id="L344" title="All 2 branches missed.">					if (nameComparator.isSame(name, thisIndexName, thatIndexName)) {</span>
+<span class="nc" id="L345">						equivalentThatName = thatName;</span>
+<span class="nc" id="L346">						propertiesAlreadyChecked = false;</span>
+<span class="nc" id="L347">						break;</span>
+					}
+<span class="nc bnc" id="L349" title="All 2 branches missed.">					if (nameComparator.isSame(name, thisIndexProperties, thatIndexProperties)) {</span>
+<span class="nc" id="L350">						equivalentThatName = thatName;</span>
+						// since the user provided custom index matcher,
+						// and that matcher returned true from the method,
+						// where it is assumed that the index's properties are being
+						// compared, ATS WILL NOT check those properties again
+<span class="nc" id="L355">						propertiesAlreadyChecked = true;</span>
+<span class="nc" id="L356">						break;</span>
+
+					}
+<span class="nc" id="L359">				}</span>
+
+<span class="nc bnc" id="L361" title="All 2 branches missed.">				if (equivalentThatName == null) {</span>
+					// no index with same name
+<span class="nc" id="L363">					equality.addIndexPresentInOneSnapshotOnly(this.snapshotName, name, thisName,</span>
+<span class="nc" id="L364">							this.indexes.get(thisName));</span>
+				}
+				else {
+<span class="nc bnc" id="L367" title="All 2 branches missed.">					if (!propertiesAlreadyChecked) {</span>
+						// there is an index with same name, now check there attributes
+<span class="nc bnc" id="L369" title="All 2 branches missed.">						if (!checkIndexesByAttributes(thisIndexProperties, thisName, thatIndexProperties,</span>
+								equivalentThatName)) {
+							// if
+							// (!this.indexes.get(thisName).equals(that.indexes.get(equivalentThatName)))
+							// {
+							// index with same name, has different attributes
+<span class="nc" id="L375">							equality.addIndexPresentInOneSnapshotOnly(this.snapshotName, name, thisName,</span>
+<span class="nc" id="L376">									this.indexes.get(thisName));</span>
+						}
+					}
+
+				}
+<span class="nc" id="L381">			}</span>
+		}
+
+<span class="nc bnc" id="L384" title="All 2 branches missed.">		if (!thatNames.isEmpty()) {</span>
+
+			// check if all indexes from THAT snapshot are present in THIS
+<span class="nc bnc" id="L387" title="All 2 branches missed.">			for (String thatName : thatNames) {</span>
+<span class="nc" id="L388">				boolean propertiesAlreadyChecked = false;</span>
+<span class="nc" id="L389">				String equivalentThisName = null;</span>
+<span class="nc" id="L390">				Properties thatIndexProperties = toProperties(that.indexes.get(thatName), INDEX_PROPERTIES_DELIMITER);</span>
+<span class="nc" id="L391">				Properties thisIndexProperties = null;</span>
+<span class="nc bnc" id="L392" title="All 2 branches missed.">				for (String thisName : thisNames) {</span>
+
+<span class="nc" id="L394">					thisIndexProperties = toProperties(this.indexes.get(thisName), INDEX_PROPERTIES_DELIMITER);</span>
+
+					// check if both indexes are on the same column in the table
+<span class="nc" id="L397">					String thisIndexColumnName = thisIndexProperties.getProperty(&quot;COLUMN_NAME&quot;);</span>
+<span class="nc bnc" id="L398" title="All 2 branches missed.">					if (thisIndexColumnName == null) {</span>
+<span class="nc" id="L399">						thisIndexColumnName = thisIndexProperties.getProperty(&quot;column_name&quot;);</span>
+<span class="nc bnc" id="L400" title="All 2 branches missed.">						if (thisIndexColumnName == null) {</span>
+<span class="nc" id="L401">							thisIndexColumnName = getIndexColumnNameFromIndexUid(thisName);</span>
+<span class="nc bnc" id="L402" title="All 2 branches missed.">							if (thisIndexColumnName == null) {</span>
+								// log warning
+<span class="nc" id="L404">								logMissingColumnNameWarning(thisName);</span>
+							}
+						}
+					}
+
+<span class="nc" id="L409">					String thatIndexColumnName = thatIndexProperties.getProperty(&quot;COLUMN_NAME&quot;);</span>
+<span class="nc bnc" id="L410" title="All 2 branches missed.">					if (thatIndexColumnName == null) {</span>
+<span class="nc" id="L411">						thatIndexColumnName = thatIndexProperties.getProperty(&quot;column_name&quot;);</span>
+<span class="nc bnc" id="L412" title="All 2 branches missed.">						if (thatIndexColumnName == null) {</span>
+<span class="nc" id="L413">							thatIndexColumnName = getIndexColumnNameFromIndexUid(thatName);</span>
+<span class="nc bnc" id="L414" title="All 2 branches missed.">							if (thatIndexColumnName == null) {</span>
+								// log warning
+<span class="nc" id="L416">								logMissingColumnNameWarning(thatName);</span>
+							}
+						}
+					}
+
+<span class="nc bnc" id="L421" title="All 4 branches missed.">					if (thisIndexColumnName != null &amp;&amp; thatIndexColumnName != null) {</span>
+<span class="nc bnc" id="L422" title="All 2 branches missed.">						if (!thisIndexColumnName.equals(thatIndexColumnName)) {</span>
+<span class="nc" id="L423">							continue;</span>
+						}
+					}
+
+<span class="nc" id="L427">					String thisIndexName = thisIndexProperties.getProperty(&quot;INDEX_NAME&quot;);</span>
+<span class="nc bnc" id="L428" title="All 2 branches missed.">					if (thisIndexName == null) {</span>
+<span class="nc" id="L429">						thisIndexName = thisIndexProperties.getProperty(&quot;index_name&quot;);</span>
+<span class="nc bnc" id="L430" title="All 2 branches missed.">						if (thisIndexName == null) {</span>
+							// MySQL specific case
+							// thisName = &lt;index uid=&quot;COLUMN_NAME=&lt;some_value&gt;,
+							// INDEX_NAME=&lt;some_value&gt;&quot;&gt;
+<span class="nc" id="L434">							thisIndexName = thisName.split(INDEX_PROPERTIES_DELIMITER)[1].split(&quot;=&quot;)[1];</span>
+						}
+					}
+
+<span class="nc" id="L438">					String thatIndexName = thatIndexProperties.getProperty(&quot;INDEX_NAME&quot;);</span>
+<span class="nc bnc" id="L439" title="All 2 branches missed.">					if (thatIndexName == null) {</span>
+<span class="nc" id="L440">						thatIndexName = thatIndexProperties.getProperty(&quot;index_name&quot;);</span>
+<span class="nc bnc" id="L441" title="All 2 branches missed.">						if (thatIndexName == null) {</span>
+							// MySQL specific case
+							// thatName = &lt;index uid=&quot;COLUMN_NAME=&lt;some_value&gt;,
+							// INDEX_NAME=&lt;some_value&gt;&quot;&gt;
+<span class="nc" id="L445">							thatIndexName = thatName.split(INDEX_PROPERTIES_DELIMITER)[1].split(&quot;=&quot;)[1];</span>
+						}
+					}
+
+<span class="nc bnc" id="L449" title="All 2 branches missed.">					if (nameComparator.isSame(name, thisIndexName, thatIndexName)) {</span>
+<span class="nc" id="L450">						equivalentThisName = thisName;</span>
+<span class="nc" id="L451">						propertiesAlreadyChecked = false;</span>
+<span class="nc" id="L452">						break;</span>
+					}
+<span class="nc bnc" id="L454" title="All 2 branches missed.">					if (nameComparator.isSame(name, thisIndexProperties, thatIndexProperties)) {</span>
+<span class="nc" id="L455">						equivalentThisName = thisName;</span>
+						// since the user provided custom index matcher,
+						// and that matcher returned true from the method,
+						// where it is assumed that the index's properties are being
+						// compared, ATS WILL NOT check those properties again
+<span class="nc" id="L460">						propertiesAlreadyChecked = true;</span>
+<span class="nc" id="L461">						break;</span>
+					}
+<span class="nc" id="L463">				}</span>
+
+<span class="nc bnc" id="L465" title="All 2 branches missed.">				if (equivalentThisName == null) {</span>
+					// no index with same name
+<span class="nc" id="L467">					equality.addIndexPresentInOneSnapshotOnly(that.snapshotName, name, thatName,</span>
+<span class="nc" id="L468">							that.indexes.get(thatName));</span>
+				}
+				else {
+<span class="nc bnc" id="L471" title="All 2 branches missed.">					if (!propertiesAlreadyChecked) {</span>
+						// there is an index with same name, now check there attributes
+<span class="nc bnc" id="L473" title="All 2 branches missed.">						if (!checkIndexesByAttributes(thisIndexProperties, equivalentThisName, thatIndexProperties,</span>
+								thatName)) {
+							// if
+							// (!this.indexes.get(thisName).equals(that.indexes.get(equivalentThatName)))
+							// {
+							// index with same name, has different attributes
+<span class="nc" id="L479">							equality.addIndexPresentInOneSnapshotOnly(that.snapshotName, name, thatName,</span>
+<span class="nc" id="L480">									that.indexes.get(thatName));</span>
+						}
+					}
+				}
+<span class="nc" id="L484">			}</span>
+		}
+<span class="nc" id="L486">	}</span>
+
+	private void logMissingColumnNameWarning(String indexName) {
+
+<span class="nc" id="L490">		log.warn(&quot;ATS was not able to obtain the column name for index '&quot; + indexName</span>
+				+ &quot;'. Comparison will proceed, but be carefull that you will be comparing indexes that maybe are over different columns.&quot;);
+
+<span class="nc" id="L493">	}</span>
+
+	/**
+	 * For Oracle DB, the column name is only presented in the Index's UID value.&lt;br&gt;
+	 * This method extracts the column name from that UID.&lt;br&gt;
+	 * It is expected that either column_name or COLUMN_NAME key is presented in the UID.
+	 * &lt;br&gt;
+	 */
+	private String getIndexColumnNameFromIndexUid(String indexUid) {
+
+<span class="nc" id="L503">		String[] tokens = indexUid.split(&quot;, &quot;);</span>
+<span class="nc bnc" id="L504" title="All 2 branches missed.">		if (tokens != null) {</span>
+<span class="nc bnc" id="L505" title="All 2 branches missed.">			for (String token : tokens) {</span>
+<span class="nc bnc" id="L506" title="All 2 branches missed.">				if (token == null) {</span>
+<span class="nc" id="L507">					continue;</span>
+				}
+<span class="nc bnc" id="L509" title="All 4 branches missed.">				if (token.contains(&quot;column_name&quot;) || token.contains(&quot;COLUMN_NAME&quot;)) {</span>
+<span class="nc" id="L510">					return token.split(&quot;=&quot;)[1];</span>
+				}
+			}
+		}
+
+<span class="nc" id="L515">		return null;</span>
+	}
+
+	/**
+	 * Compare DB table indexes by attributes
+	 * @param thisIndex full string representation of an table index from the first
+	 * snapshot
+	 * @param thatIndex full string representation of an table index from the second
+	 * snapshot
+	 * @return &lt;strong&gt;true&lt;/strong&gt; if indexes are the same, &lt;strong&gt;false&lt;/strong&gt;
+	 * otherwise
+	 */
+	private boolean checkIndexesByAttributes(Properties thisIndexProps, String thisIndexUid, Properties thatIndexProps,
+			String thatIndexUid) {
+
+		try {
+
+			// remove the indexes' names since they were already checked via
+			// IndexNameMatcher
+<span class="nc" id="L534">			thisIndexProps.remove(&quot;INDEX_NAME&quot;);</span>
+<span class="nc" id="L535">			thisIndexProps.remove(&quot;index_name&quot;);</span>
+<span class="nc" id="L536">			thatIndexProps.remove(&quot;INDEX_NAME&quot;);</span>
+<span class="nc" id="L537">			thatIndexProps.remove(&quot;index_name&quot;);</span>
+
+			// since there may be multiple indexes for one table
+			// check that both indexes that are compared here are on the same column
+<span class="nc" id="L541">			String thisIndexColumnName = null;</span>
+<span class="nc" id="L542">			String thatIndexColumnName = null;</span>
+
+<span class="nc bnc" id="L544" title="All 2 branches missed.">			if (thisIndexProps.containsKey(&quot;COLUMN_NAME&quot;)) {</span>
+<span class="nc" id="L545">				thisIndexColumnName = thisIndexProps.getProperty(&quot;COLUMN_NAME&quot;);</span>
+			}
+<span class="nc bnc" id="L547" title="All 2 branches missed.">			else if (thisIndexProps.containsKey(&quot;column_name&quot;)) {</span>
+<span class="nc" id="L548">				thisIndexColumnName = thisIndexProps.getProperty(&quot;column_name&quot;);</span>
+			}
+			else {
+<span class="nc" id="L551">				thisIndexColumnName = getIndexColumnNameFromIndexUid(thisIndexUid);</span>
+			}
+
+<span class="nc bnc" id="L554" title="All 2 branches missed.">			if (thatIndexProps.containsKey(&quot;COLUMN_NAME&quot;)) {</span>
+<span class="nc" id="L555">				thatIndexColumnName = thatIndexProps.getProperty(&quot;COLUMN_NAME&quot;);</span>
+			}
+<span class="nc bnc" id="L557" title="All 2 branches missed.">			else if (thatIndexProps.containsKey(&quot;column_name&quot;)) {</span>
+<span class="nc" id="L558">				thatIndexColumnName = thatIndexProps.getProperty(&quot;column_name&quot;);</span>
+			}
+			else {
+<span class="nc" id="L561">				thatIndexColumnName = getIndexColumnNameFromIndexUid(thatIndexUid);</span>
+			}
+
+<span class="nc bnc" id="L564" title="All 4 branches missed.">			if (thisIndexColumnName != null &amp;&amp; thatIndexColumnName != null) {</span>
+<span class="nc bnc" id="L565" title="All 2 branches missed.">				if (thisIndexColumnName.equals(thatIndexColumnName)) {</span>
+<span class="nc" id="L566">					return compareIndexProperties(thisIndexProps, thatIndexProps);</span>
+				}
+				else {
+<span class="nc" id="L569">					return false;</span>
+				}
+			}
+			else {
+<span class="nc" id="L573">				return compareIndexProperties(thisIndexProps, thatIndexProps);</span>
+			}
+
+		}
+<span class="nc" id="L577">		catch (Exception e) {</span>
+<span class="nc" id="L578">			log.error(&quot;Error while comparing db table indexes&quot;, e);</span>
+<span class="nc" id="L579">			return false;</span>
+		}
+	}
+
+	private boolean compareIndexProperties(Properties thisIndexProps, Properties thatIndexProps) {
+
+<span class="nc" id="L585">		StringWriter sw1 = new StringWriter();</span>
+<span class="nc" id="L586">		thisIndexProps.list(new PrintWriter(sw1));</span>
+
+<span class="nc" id="L588">		StringWriter sw2 = new StringWriter();</span>
+<span class="nc" id="L589">		thatIndexProps.list(new PrintWriter(sw2));</span>
+
+<span class="nc" id="L591">		return sw1.toString().equals(sw2.toString());</span>
+	}
+
+	@Override
+	public String toString() {
+
+<span class="nc" id="L597">		StringBuilder description = new StringBuilder();</span>
+<span class="nc" id="L598">		description.append(&quot;Table &quot;);</span>
+<span class="nc" id="L599">		description.append(name);</span>
+
+<span class="nc" id="L601">		description.append(&quot;;\nPrimary key: &quot;);</span>
+<span class="nc" id="L602">		description.append(primaryKeyColumn);</span>
+
+<span class="nc" id="L604">		description.append(&quot;;\nColumns: &quot;);</span>
+<span class="nc bnc" id="L605" title="All 2 branches missed.">		for (String colum : getColumnNames()) {</span>
+<span class="nc" id="L606">			description.append(colum);</span>
+<span class="nc" id="L607">			description.append(&quot;, &quot;);</span>
+<span class="nc" id="L608">		}</span>
+<span class="nc" id="L609">		return description.substring(0, description.length() - 2);</span>
+	}
+
+	public void toXmlNode(Document dom, Element tableNode) {
+
+<span class="nc" id="L614">		tableNode.setAttribute(DatabaseSnapshotUtils.ATTR_TABLE_NAME, name);</span>
+<span class="nc" id="L615">		tableNode.setAttribute(DatabaseSnapshotUtils.ATTR_TABLE_PRIMARY_KEY, primaryKeyColumn);</span>
+
+		// append column descriptions
+<span class="nc" id="L618">		Element columnDescriptionsNode = dom.createElement(DatabaseSnapshotUtils.NODE_COLUMN_DESCRIPTIONS);</span>
+<span class="nc" id="L619">		tableNode.appendChild(columnDescriptionsNode);</span>
+
+<span class="nc bnc" id="L621" title="All 2 branches missed.">		for (String columnDescription : columnDescriptions) {</span>
+<span class="nc" id="L622">			Element columnDescriptionNode = dom.createElement(DatabaseSnapshotUtils.NODE_COLUMN_DESCRIPTION);</span>
+<span class="nc" id="L623">			columnDescriptionNode.setTextContent(columnDescription);</span>
+<span class="nc" id="L624">			columnDescriptionsNode.appendChild(columnDescriptionNode);</span>
+<span class="nc" id="L625">		}</span>
+
+		// append indexes
+<span class="nc bnc" id="L628" title="All 2 branches missed.">		if (indexes.keySet().size() &gt; 0) {</span>
+<span class="nc" id="L629">			Element indexesNode = dom.createElement(DatabaseSnapshotUtils.NODE_INDEXES);</span>
+<span class="nc" id="L630">			tableNode.appendChild(indexesNode);</span>
+
+<span class="nc bnc" id="L632" title="All 2 branches missed.">			for (String indexName : indexes.keySet()) {</span>
+<span class="nc" id="L633">				Element indexNode = dom.createElement(DatabaseSnapshotUtils.NODE_INDEX);</span>
+<span class="nc" id="L634">				indexNode.setAttribute(DatabaseSnapshotUtils.ATTR_NODE_INDEX_UID, indexName);</span>
+<span class="nc" id="L635">				indexNode.setTextContent(indexes.get(indexName));</span>
+<span class="nc" id="L636">				indexesNode.appendChild(indexNode);</span>
+<span class="nc" id="L637">			}</span>
+		}
+<span class="nc" id="L639">	}</span>
+
+	public static TableDescription fromXmlNode(String snapshotName, Element tableNode) {
+
+<span class="nc" id="L643">		TableDescription instance = new TableDescription();</span>
+
+		// add basic table info
+<span class="nc" id="L646">		instance.setSnapshotName(snapshotName);</span>
+<span class="nc" id="L647">		instance.setName(tableNode.getAttribute(DatabaseSnapshotUtils.ATTR_TABLE_NAME));</span>
+<span class="nc" id="L648">		instance.setPrimaryKeyColumn(tableNode.getAttribute(DatabaseSnapshotUtils.ATTR_TABLE_PRIMARY_KEY));</span>
+
+		// add column descriptions
+<span class="nc" id="L651">		List&lt;Element&gt; columnDescriptionsListNodes = DatabaseSnapshotUtils.getChildrenByTagName(tableNode,</span>
+				DatabaseSnapshotUtils.NODE_COLUMN_DESCRIPTIONS);
+<span class="nc bnc" id="L653" title="All 2 branches missed.">		if (columnDescriptionsListNodes.size() != 1) {</span>
+<span class="nc" id="L654">			throw new DatabaseSnapshotException(&quot;Bad dabase snapshot backup file. Table with name '&quot;</span>
+<span class="nc" id="L655">					+ tableNode.getAttribute(DatabaseSnapshotUtils.ATTR_TABLE_NAME) + &quot;' must have 1 '&quot;</span>
+					+ DatabaseSnapshotUtils.NODE_COLUMN_DESCRIPTIONS + &quot;' subnode, but it has&quot;
+<span class="nc" id="L657">					+ columnDescriptionsListNodes.size());</span>
+		}
+<span class="nc" id="L659">		List&lt;Element&gt; columnDescriptionNodes = DatabaseSnapshotUtils</span>
+<span class="nc" id="L660">			.getChildrenByTagName(columnDescriptionsListNodes.get(0), DatabaseSnapshotUtils.NODE_COLUMN_DESCRIPTION);</span>
+<span class="nc" id="L661">		List&lt;String&gt; columnDescriptions = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L662" title="All 2 branches missed.">		for (Element columnDescriptionNode : columnDescriptionNodes) {</span>
+<span class="nc" id="L663">			columnDescriptions.add(columnDescriptionNode.getTextContent());</span>
+<span class="nc" id="L664">		}</span>
+<span class="nc" id="L665">		instance.setColumnDescriptions(columnDescriptions);</span>
+
+		// add indexes
+<span class="nc" id="L668">		List&lt;Element&gt; indexesListNodes = DatabaseSnapshotUtils.getChildrenByTagName(tableNode,</span>
+				DatabaseSnapshotUtils.NODE_INDEXES);
+<span class="nc bnc" id="L670" title="All 2 branches missed.">		if (indexesListNodes.size() &gt; 1) {</span>
+<span class="nc" id="L671">			throw new DatabaseSnapshotException(&quot;Bad dabase snapshot backup file. Table with name '&quot;</span>
+<span class="nc" id="L672">					+ tableNode.getAttribute(DatabaseSnapshotUtils.ATTR_TABLE_NAME) + &quot;' must have 0 or 1 '&quot;</span>
+<span class="nc" id="L673">					+ DatabaseSnapshotUtils.NODE_INDEXES + &quot;' subnode, but it has&quot; + indexesListNodes.size());</span>
+		}
+<span class="nc bnc" id="L675" title="All 2 branches missed.">		if (indexesListNodes.size() == 1) {</span>
+<span class="nc" id="L676">			List&lt;Element&gt; indexNodes = DatabaseSnapshotUtils.getChildrenByTagName(indexesListNodes.get(0),</span>
+					DatabaseSnapshotUtils.NODE_INDEX);
+<span class="nc" id="L678">			Map&lt;String, String&gt; indexes = new HashMap&lt;&gt;();</span>
+<span class="nc bnc" id="L679" title="All 2 branches missed.">			for (Element indexNode : indexNodes) {</span>
+<span class="nc" id="L680">				indexes.put(indexNode.getAttribute(DatabaseSnapshotUtils.ATTR_NODE_INDEX_UID),</span>
+<span class="nc" id="L681">						indexNode.getTextContent());</span>
+<span class="nc" id="L682">			}</span>
+<span class="nc" id="L683">			instance.setIndexes(indexes);</span>
+		}
+
+<span class="nc" id="L686">		return instance;</span>
+	}
+
+	/**
+	 * Get the index properties as {@link Properties} object
+	 * @param indexAndColumnName - for Oracle and SQL Server the value MUST be
+	 * column_and_index_name=&lt;value&gt;, for MySQL, it is INDEX_UID=&lt;value&gt; and for
+	 * PostgreSQL -&gt; index_uid=&lt;value&gt;
+	 * @return {@link Properties} object, containing all of the index properties
+	 * @throws RuntimeException - if index with this indexAndColumnName, does not exist
+	 */
+	public Properties getIndexProperties(String indexAndColumnName) {
+
+<span class="nc bnc" id="L699" title="All 2 branches missed.">		if (this.indexes.containsKey(indexAndColumnName)) {</span>
+<span class="nc" id="L700">			return toProperties(this.indexes.get(indexAndColumnName), INDEX_PROPERTIES_DELIMITER);</span>
+		}
+		else {
+<span class="nc" id="L703">			throw new RuntimeException(&quot;No such index with UID (index and column name) '&quot; + indexAndColumnName + &quot;'&quot;);</span>
+		}
+	}
+
+	/**
+	 * Create {@link java.util.Properties} object from String
+	 * @param inputString the String, containing the properties in format
+	 * key1=valDELIMITERkey2=val
+	 * @param delimiter the delimiter used to separate each property
+	 */
+	private Properties toProperties(String inputString, String delimiter) {
+
+<span class="nc" id="L715">		inputString = inputString.replace(delimiter, AtsSystemProperties.SYSTEM_LINE_SEPARATOR);</span>
+<span class="nc" id="L716">		Properties properties = new Properties();</span>
+		try {
+<span class="nc" id="L718">			properties.load(new StringReader(inputString));</span>
+		}
+<span class="nc" id="L720">		catch (IOException e) {</span>
+<span class="nc" id="L721">			throw new RuntimeException(</span>
+					&quot;Unable to load java.util.Properties from java.lang.String using delimiter '&quot; + delimiter + &quot;'&quot;, e);
+<span class="nc" id="L723">		}</span>
+<span class="nc" id="L724">		return properties;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
