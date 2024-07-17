@@ -1,0 +1,413 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AtsSystemProperties.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ATS-CommonLibrary</a> &gt; <a href="index.source.html" class="el_package">com.axway.ats.common.systemproperties</a> &gt; <span class="el_source">AtsSystemProperties.java</span></div><h1>AtsSystemProperties.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2017-2021 Axway Software
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.axway.ats.common.systemproperties;
+
+import com.axway.ats.common.PublicAtsApi;
+
+/**
+ * This class is used as a central place for working with ATS related system properties.
+ * It is good if all such system properties are prefixed with &quot;ats.&quot;
+ */
+@PublicAtsApi
+<span class="nc" id="L25">public class AtsSystemProperties {</span>
+
+	// Action library properties
+
+	/** Default polling interval for new process output in milliseconds */
+	@PublicAtsApi
+	public static final String ACTION__PROCESS_OUTPUT_POLL_INTERVAL = &quot;ats.action.process.output.polling.interval&quot;;
+
+	public static final int ACTION__PROCESS_OUTPUT_POLL_INTERVAL_DEFAULT = 500; // ms
+
+	// Agent properties
+	@PublicAtsApi
+	public static final String DEFAULT_AGENT_PORT_KEY = &quot;ats.agent.default.port&quot;;
+
+	@PublicAtsApi
+	public static final int DEFAULT_AGENT_PORT_VALUE = 8089;
+
+	@PublicAtsApi
+	public static final String AGENT_HOME_FOLDER = &quot;ats.agent.home&quot;;
+
+	public static final String AGENT__MONITOR_POLL_INTERVAL = &quot;ats.agent.monitor.poll.interval&quot;;
+
+	@PublicAtsApi
+	public static final String AGENT__MONITOR_INITIAL_POLL_DELAY = &quot;ats.agent.monitor.initial.poll.delay&quot;;
+
+	@PublicAtsApi
+	public static final String AGENT__COMPONENTS_FOLDER = &quot;ats.agent.components.folder&quot;;
+
+	@PublicAtsApi
+	public static final String AGENT__TEMPLATE_ACTIONS_PROXY_PROPERTY = &quot;ats.agent.template.actions.proxy&quot;; // Key
+																											// to
+																											// specify
+																											// proxy
+																											// for
+																											// template
+																											// action
+																											// requests
+
+	public static final String AGENT__REGISTER_FULL_AND_NET_ACTION_TIME_FOR_TEMPLATE_ACTIONS_KEY = &quot;ats.agent.template.actions.register_full_and_net_action_time&quot;; // Property
+																																									// to
+																																									// enable
+																																									// full
+																																									// action
+																																									// time
+																																									// logging
+																																									// in
+																																									// addition
+																																									// to
+																																									// net+server
+																																									// think
+																																									// time
+
+	public static final String AGENT__TEMPLATE_ACTIONS_FOLDER = &quot;ats.agent.template.actions.folder&quot;;
+
+	public static final String AGENT__TEMPLATE_ACTIONS_MATCH_FILES_BY_SIZE = &quot;ats.agent.template.actions.match.files.by.size&quot;;
+
+	public static final String AGENT__TEMPLATE_ACTIONS_MATCH_FILES_BY_CONTENT = &quot;ats.agent.template.actions.match.files.by.content&quot;;
+
+	// Log properties
+	@PublicAtsApi
+	public static final String LOG__MONITOR_EVENTS_QUEUE = &quot;ats.log.monitor.events.queue&quot;;
+
+	@PublicAtsApi
+	public static final String LOG__CLASSPATH_ON_START = &quot;ats.log.classpath.on.start&quot;;
+
+	/**
+	 * &lt;p&gt;
+	 * Enable caching of the class and method that created any of the
+	 * AbstractLoggingEvent(s).
+	 * &lt;/p&gt;
+	 * &lt;p&gt;
+	 * In other words, when for example a call like AtsDbLogger.startRun() is executed,
+	 * the StartRunEvent will cache/save where that call was made in the format:
+	 * full_class_name.method:line_number
+	 * &lt;/p&gt;
+	 *
+	 */
+	public static final String LOG__CACHE_EVENTS_SOURCE_LOCATION = &quot;ats.log.cache.events.source.location&quot;;
+
+	/**
+	 * The MAX number of events that will be processed at once when batch mode is
+	 * enabled.&lt;br&gt;
+	 * This means that if we set this property's value to be 2000, once a 2000 events are
+	 * in the queue, they will be sent to the log DB at once.
+	 */
+	@PublicAtsApi
+	public static final String LOG__MAX_CACHE_EVENTS = &quot;ats.log.db.max.cache.events&quot;;
+
+	/**
+	 * When the test execution db logging is in batch mode, there is a cache for
+	 * events.&lt;br&gt;
+	 * That cache size is managed by
+	 * {@link AtsSystemProperties#LOG__MAX_CACHE_EVENTS}.&lt;br&gt;
+	 * This means that the cache is flushed, when the cache size is reached. But the user
+	 * can force the cache to be flushed after a certain time interval expired and that
+	 * time interval is configured by this property.&lt;br&gt;
+	 * Note that the timeout must be in &lt;strong&gt;seconds&lt;/strong&gt;
+	 */
+	@PublicAtsApi
+	public static final String LOG__MAX_CACHE_EVENTS_FLUSH_TIMEOUT = &quot;ats.log.db.max.cache.events.flush.timeout&quot;;
+
+	// TestHarness properties
+	// Run name for JUnit executions
+	@PublicAtsApi
+	public static final String TEST_HARNESS__JUNIT_RUN_NAME = &quot;ats.junit.RunName&quot;;
+
+	// source location of the running tests
+	@PublicAtsApi
+	public static final String TEST_HARNESS__TESTS_SOURCE_LOCATION = &quot;ats.tests.source.location&quot;;
+
+	// UI Engine properties
+	// milliseconds to delay between swing events
+	@PublicAtsApi
+	public static final String UI_ENGINE__SWING_ROBOT_DELAY_BETWEEN_EVENTS = &quot;ats.uiengine.swing.RobotDelayBetweenEvents&quot;;
+
+	// Core properties
+	// Java secure channel verbose mode
+	@PublicAtsApi
+	public static final String CORE__JSCH_VERBOSE_MODE = &quot;ats.core.ssh.verbose.mode&quot;;
+
+	/**
+	 * Toggle whether to log all of the client's (SystemMonitor) requests from the test
+	 * executor to the monitoring service (ATS Agent)
+	 */
+	public static final String SYSTEM_MONITOR_VERBOSE_MODE = &quot;ats.system.monitor.verbose.mode&quot;;
+
+	/*
+	 * Following are system properties which are not supposed to be changed during the VM
+	 * lifetime, so we do not need to read them more than once.
+	 */
+<span class="fc" id="L155">	public static final String SYSTEM_LINE_SEPARATOR = System.getProperty(&quot;line.separator&quot;);</span>
+
+<span class="fc" id="L157">	public static final String SYSTEM_FILE_SEPARATOR = System.getProperty(&quot;file.separator&quot;);</span>
+
+<span class="fc" id="L159">	public static final String SYSTEM_OS_NAME = System.getProperty(&quot;os.name&quot;);</span>
+
+<span class="fc" id="L161">	public static final String SYSTEM_USER_TEMP_DIR = System.getProperty(&quot;java.io.tmpdir&quot;);</span>
+
+<span class="fc" id="L163">	public static final String SYSTEM_JAVA_HOME_DIR = System.getProperty(&quot;java.home&quot;);</span>
+
+<span class="fc" id="L165">	public static final String SYSTEM_HTTP_PROXY_HOST = System.getProperty(&quot;http.proxyHost&quot;);</span>
+
+<span class="fc" id="L167">	public static final String SYSTEM_HTTP_PROXY_PORT = System.getProperty(&quot;http.proxyPort&quot;);</span>
+
+	/**
+	 * User directory as of initial call of this class. Note that actual value of this
+	 * system property could be changed later. And it seems that currently there is no
+	 * easy Java-only reliable way to change actual current directory.
+	 */
+<span class="fc" id="L174">	public static final String USER_CURRENT_DIR = System.getProperty(&quot;user.dir&quot;);</span>
+
+<span class="fc" id="L176">	public static final String USER_NAME = System.getProperty(&quot;user.name&quot;);</span>
+
+	/**
+	 * Specify which monitoring provider to used.&lt;br/&gt;
+	 * Currently the available once are:&lt;br/&gt;
+	 * &lt;ol&gt;
+	 * &lt;li&gt;&lt;strong&gt;sigar&lt;/strong&gt; (default one)&lt;/li&gt;
+	 * &lt;li&gt;&lt;strong&gt;oshi&lt;/strong&gt;&lt;/li&gt;
+	 * &lt;/ol&gt;
+	 *
+	 */
+	public static final String SYSTEM_MONITORING_PROVIDER = &quot;ats.system.monitoring.provider&quot;;
+
+	/**
+	 * Toggle whether an exception will be thrown if the ATS Framework version is not the
+	 * same as the Log DB or any of the agents/loaders that are used.&lt;br/&gt;
+	 * Default value is &lt;strong&gt;false&lt;/strong&gt;, which will just log a WARN message.
+	 *
+	 */
+	public static final String FAIL_ON_ATS_VERSION_MISMATCH = &quot;ats.core.fail.on.version.mismatch&quot;;
+
+	/**
+	 * @return the default ATS agent port number
+	 */
+	@PublicAtsApi
+	public static Integer getAgentDefaultPort() {
+
+<span class="nc" id="L203">		Integer defaultPort = null;</span>
+		try {
+<span class="nc" id="L205">			defaultPort = getPropertyAsNumber(DEFAULT_AGENT_PORT_KEY);</span>
+		}
+<span class="nc" id="L207">		catch (IllegalArgumentException iae) {</span>
+<span class="nc" id="L208">			System.err.println(iae.getMessage());</span>
+<span class="nc" id="L209">		}</span>
+
+<span class="nc bnc" id="L211" title="All 2 branches missed.">		if (defaultPort == null) {</span>
+<span class="nc" id="L212">			defaultPort = DEFAULT_AGENT_PORT_VALUE;</span>
+		}
+<span class="nc" id="L214">		return defaultPort;</span>
+	}
+
+	/**
+	 * @param defaultAgentPort the new default ATS agent port number
+	 */
+	@PublicAtsApi
+	public static void setAgentDefaultPort(int defaultAgentPort) {
+
+<span class="nc" id="L223">		System.setProperty(DEFAULT_AGENT_PORT_KEY, String.valueOf(defaultAgentPort));</span>
+<span class="nc" id="L224">	}</span>
+
+	/**
+	 * Return a system property as an integer number. Return null if key is not present.
+	 * Throw an exception if value is invalid
+	 * @param key the name of the searched system property
+	 * @return a number
+	 */
+	@PublicAtsApi
+	public static Integer getPropertyAsNumber(String key) {
+
+<span class="nc" id="L235">		String strValue = getPropertyAsString(key);</span>
+
+<span class="nc bnc" id="L237" title="All 2 branches missed.">		if (strValue == null) {</span>
+<span class="nc" id="L238">			return null;</span>
+		}
+		else {
+			try {
+<span class="nc" id="L242">				return Integer.parseInt(strValue);</span>
+			}
+<span class="nc" id="L244">			catch (NumberFormatException nfe) {</span>
+<span class="nc" id="L245">				throw new IllegalArgumentException(</span>
+						&quot;System property with name '&quot; + key + &quot;' has a non integer value '&quot; + strValue + &quot;'&quot;);
+			}
+		}
+	}
+
+	/**
+	 * Return a system property as an integer number
+	 * @param key the name of the searched system property
+	 * @param defaultValue default value in case the system property does not exist or is
+	 * invalid
+	 * @return a number
+	 */
+	@PublicAtsApi
+	public static Integer getPropertyAsNumber(String key, Integer defaultValue) {
+
+<span class="nc" id="L261">		String strValue = getPropertyAsString(key);</span>
+
+<span class="nc bnc" id="L263" title="All 2 branches missed.">		if (strValue != null) {</span>
+			try {
+<span class="nc" id="L265">				return Integer.parseInt(strValue);</span>
+			}
+<span class="nc" id="L267">			catch (NumberFormatException nfe) {</span>
+<span class="nc bnc" id="L268" title="All 2 branches missed.">				if (defaultValue == null) {</span>
+<span class="nc" id="L269">					throw new IllegalArgumentException(</span>
+							&quot;System property with name '&quot; + key + &quot;' has a non integer value '&quot; + strValue + &quot;'&quot;);
+				}
+			}
+		}
+<span class="nc" id="L274">		return defaultValue;</span>
+	}
+
+	/**
+	 * If key is found and is parsed OK - the wanted value is returned.&lt;br&gt;
+	 * If key is found and fail parsing - an error is thrown
+	 *
+	 * If key is not found - null is returned.&lt;br&gt;
+	 * @param key the name of the searched system property
+	 * @return a boolean value
+	 */
+	@PublicAtsApi
+	public static Boolean getPropertyAsBoolean(String key) {
+
+<span class="nc" id="L288">		return getPropertyAsBoolean(key, null);</span>
+	}
+
+	/**
+	 * If key is found and is parsed OK - the wanted value is returned.&lt;br&gt;
+	 * If key is found and fail parsing - default value is returned if provided, otherwise
+	 * an error is thrown
+	 *
+	 * If key is not found - default value is returned if provided, otherwise null is
+	 * returned.&lt;br&gt;
+	 * @param key the name of the searched system property
+	 * @param defaultValue default value in case the system property does not exist or is
+	 * invalid
+	 * @return a boolean value
+	 */
+	@PublicAtsApi
+	public static Boolean getPropertyAsBoolean(String key, Boolean defaultValue) {
+
+<span class="nc" id="L306">		String strValue = getPropertyAsString(key);</span>
+
+<span class="nc bnc" id="L308" title="All 2 branches missed.">		if (strValue != null) {</span>
+<span class="nc bnc" id="L309" title="All 4 branches missed.">			if (strValue.equalsIgnoreCase(&quot;true&quot;) || strValue.equals(&quot;1&quot;)) {</span>
+<span class="nc" id="L310">				return Boolean.TRUE;</span>
+			}
+
+<span class="nc bnc" id="L313" title="All 4 branches missed.">			if (strValue.equalsIgnoreCase(&quot;false&quot;) || strValue.equals(&quot;0&quot;)) {</span>
+<span class="nc" id="L314">				return Boolean.FALSE;</span>
+			}
+
+<span class="nc bnc" id="L317" title="All 2 branches missed.">			if (defaultValue == null) {</span>
+<span class="nc" id="L318">				throw new IllegalArgumentException(&quot;System property with name '&quot; + key + &quot;' has a non boolean value '&quot;</span>
+						+ strValue + &quot;'. Expected values are 'true' or '1' for TRUE and 'false' or '0' for FALSE.&quot;);
+			}
+		}
+<span class="nc" id="L322">		return defaultValue;</span>
+	}
+
+	/**
+	 * If key is found and is parsed OK - the wanted value is returned.&lt;br&gt;
+	 * If key is found and fail parsing - an error is thrown
+	 *
+	 * If key is not found - null is returned.&lt;br&gt;
+	 * @param key the name of the searched system property
+	 * @return a number that is 0 or above
+	 */
+	@PublicAtsApi
+	public static Integer getPropertyAsNonNegativeNumber(String key) {
+
+<span class="nc" id="L336">		return getPropertyAsNonNegativeNumber(key, null);</span>
+	}
+
+	/**
+	 * If key is found and is parsed OK - the wanted value is returned.&lt;br&gt;
+	 * If key is found and fail parsing - default value is returned if provided, otherwise
+	 * an error is thrown
+	 *
+	 * If key is not found - default value is returned if provided, otherwise null is
+	 * returned.&lt;br&gt;
+	 * @param key the name of the searched system property
+	 * @param defaultValue default value in case the system property does not exist or is
+	 * invalid
+	 * @return a number that is 0 or above
+	 */
+	@PublicAtsApi
+	public static Integer getPropertyAsNonNegativeNumber(String key, Integer defaultValue) {
+
+<span class="nc" id="L354">		String strValue = getPropertyAsString(key);</span>
+
+<span class="nc bnc" id="L356" title="All 2 branches missed.">		if (strValue != null) {</span>
+			try {
+<span class="nc" id="L358">				int intValue = Integer.parseInt(strValue);</span>
+<span class="nc bnc" id="L359" title="All 4 branches missed.">				if (intValue &lt; 0 &amp;&amp; defaultValue == null) {</span>
+<span class="nc" id="L360">					throw new IllegalArgumentException(</span>
+							&quot;System property with name '&quot; + key + &quot;' has a non positive number '&quot; + strValue + &quot;'&quot;);
+				}
+<span class="nc" id="L363">				return intValue;</span>
+			}
+<span class="nc" id="L365">			catch (NumberFormatException nfe) {</span>
+<span class="nc bnc" id="L366" title="All 2 branches missed.">				if (defaultValue == null) {</span>
+<span class="nc" id="L367">					throw new IllegalArgumentException(</span>
+							&quot;System property with name '&quot; + key + &quot;' has a non number value '&quot; + strValue + &quot;'&quot;);
+				}
+			}
+		}
+<span class="nc" id="L372">		return defaultValue;</span>
+	}
+
+	/**
+	 * Return a system property as a String. Return null if not present.
+	 * @param key the name of the searched system property
+	 * @return the property value trimmed or null if it does not exist
+	 */
+	@PublicAtsApi
+	public static String getPropertyAsString(String key) {
+
+<span class="nc" id="L383">		String value = System.getProperty(key);</span>
+
+<span class="nc bnc" id="L385" title="All 2 branches missed.">		if (value == null) {</span>
+<span class="nc" id="L386">			return value;</span>
+		}
+		else {
+<span class="nc" id="L389">			return value.trim();</span>
+		}
+	}
+
+	/**
+	 * Return a system property as a String if existing. Otherwise return defaultValue
+	 * @param key the name of the searched system property
+	 * @param defaultValue default value to return if property not defined
+	 * @return the property value trimmed or defaultValue if there is no value set yet
+	 */
+	@PublicAtsApi
+	public static String getPropertyAsString(String key, String defaultValue) {
+
+<span class="nc" id="L402">		String value = System.getProperty(key);</span>
+
+<span class="nc bnc" id="L404" title="All 2 branches missed.">		if (value == null) {</span>
+<span class="nc" id="L405">			return defaultValue;</span>
+		}
+		else {
+<span class="nc" id="L408">			return value.trim();</span>
+		}
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

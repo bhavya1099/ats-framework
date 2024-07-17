@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OperatingSystemType.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ATS-CommonLibrary</a> &gt; <a href="index.source.html" class="el_package">com.axway.ats.common.system</a> &gt; <span class="el_source">OperatingSystemType.java</span></div><h1>OperatingSystemType.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2017 Axway Software
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.axway.ats.common.system;
+
+import com.axway.ats.common.PublicAtsApi;
+import com.axway.ats.common.systemproperties.AtsSystemProperties;
+
+/**
+ * Enumeration representing the operating system type. Includes method for checking
+ * current OS type.
+ * &lt;p&gt;
+ * Alternatively you may use SystemUtils from Apache Commons Lang
+ * &lt;/p&gt;
+ */
+<span class="fc" id="L28">@PublicAtsApi</span>
+public enum OperatingSystemType {
+
+<span class="fc" id="L31">	@PublicAtsApi</span>
+	WINDOWS,
+
+<span class="fc" id="L34">	@PublicAtsApi</span>
+	LINUX,
+
+<span class="fc" id="L37">	@PublicAtsApi</span>
+	SOLARIS,
+
+<span class="fc" id="L40">	@PublicAtsApi</span>
+	AIX,
+
+<span class="fc" id="L43">	@PublicAtsApi</span>
+	HP_UX,
+
+<span class="fc" id="L46">	@PublicAtsApi</span>
+	MAC_OS,
+
+<span class="fc" id="L49">	@PublicAtsApi</span>
+	UNKNOWN;
+
+	private static OperatingSystemType currentOs;
+
+	private static final String OS_WINDOWS_PREFIX = &quot;Windows&quot;;
+
+	private static final String OS_LINUX = &quot;Linux&quot;;
+
+	private static final String OS_SOLARIS = &quot;Solaris&quot;;
+
+	private static final String OS_SUNOS = &quot;SunOS&quot;;
+
+	private static final String OS_HP_UX = &quot;HP-UX&quot;;
+
+	private static final String OS_AIX = &quot;AIX&quot;;
+
+	private static final String OS_MAC_OS_LOWER_CASE_PREFIX = &quot;mac os&quot;; // generally seen
+																		// as &quot;Mac OS&quot;
+
+	static {
+		// static section to initialize the current OS type
+<span class="fc" id="L71">		currentOs = getOsType(AtsSystemProperties.SYSTEM_OS_NAME);</span>
+<span class="fc" id="L72">	}</span>
+
+	/**
+	 * Check if this {@link OperatingSystemType} instance is a UNIX-type system
+	 * @return true if this instance is a Unix-type system
+	 */
+	@PublicAtsApi
+	public boolean isUnix() {
+
+<span class="nc bnc" id="L81" title="All 10 branches missed.">		if (this == LINUX || this == SOLARIS || this == AIX || this == HP_UX || this == MAC_OS) {</span>
+			// Mac Os is UNIX / UNIX 03 certified since 10.5 -
+			// https://en.wikipedia.org/wiki/MacOS#cite_note-leopard_unix_cert-13
+<span class="nc" id="L84">			return true;</span>
+		}
+
+<span class="nc" id="L87">		return false;</span>
+	}
+
+	/**
+	 * Check if this {@link OperatingSystemType} instance is a Windows system
+	 * @return true if this instance is a Windows system
+	 */
+	@PublicAtsApi
+	public boolean isWindows() {
+
+<span class="nc bnc" id="L97" title="All 2 branches missed.">		return this == WINDOWS;</span>
+	}
+
+	/**
+	 * Check if this {@link OperatingSystemType} instance is a Mac OS / macOS system
+	 * @return true if this instance is a Mac OS system like macOS 10.x
+	 */
+	@PublicAtsApi
+	public boolean isMacOs() {
+
+<span class="nc bnc" id="L107" title="All 2 branches missed.">		return this == MAC_OS;</span>
+	}
+
+	/**
+	 * Get the operating system on which the current JVM runs
+	 * @return the OS on which this JVM runs
+	 */
+	@PublicAtsApi
+	public static OperatingSystemType getCurrentOsType() {
+
+<span class="nc" id="L117">		return currentOs;</span>
+	}
+
+	/**
+	 * Extract the operating system type from the name
+	 * @param osName the name of the operating system
+	 * @return the OS type
+	 */
+	@PublicAtsApi
+	public static OperatingSystemType getOsType(String osName) {
+
+		// not sure if this can happen
+<span class="pc bpc" id="L129" title="1 of 2 branches missed.">		if (osName == null) {</span>
+<span class="nc" id="L130">			return OperatingSystemType.UNKNOWN;</span>
+		}
+
+<span class="fc bfc" id="L133" title="All 2 branches covered.">		if (osName.startsWith(OS_WINDOWS_PREFIX)) {</span>
+<span class="fc" id="L134">			return OperatingSystemType.WINDOWS;</span>
+		}
+<span class="fc bfc" id="L136" title="All 2 branches covered.">		else if (osName.equalsIgnoreCase(OS_LINUX)) {</span>
+<span class="fc" id="L137">			return OperatingSystemType.LINUX;</span>
+		}
+<span class="pc bpc" id="L139" title="2 of 4 branches missed.">		else if (osName.equalsIgnoreCase(OS_SOLARIS) || osName.equalsIgnoreCase(OS_SUNOS)) {</span>
+<span class="nc" id="L140">			return OperatingSystemType.SOLARIS;</span>
+		}
+<span class="pc bpc" id="L142" title="1 of 2 branches missed.">		else if (osName.equalsIgnoreCase(OS_AIX)) {</span>
+<span class="nc" id="L143">			return OperatingSystemType.AIX;</span>
+		}
+<span class="pc bpc" id="L145" title="1 of 2 branches missed.">		else if (osName.equalsIgnoreCase(OS_HP_UX)) {</span>
+<span class="nc" id="L146">			return OperatingSystemType.HP_UX;</span>
+		}
+<span class="fc bfc" id="L148" title="All 2 branches covered.">		else if (osName.toLowerCase().startsWith(OS_MAC_OS_LOWER_CASE_PREFIX)) {</span>
+<span class="fc" id="L149">			return OperatingSystemType.MAC_OS;</span>
+		}
+		else {
+<span class="fc" id="L152">			return OperatingSystemType.UNKNOWN;</span>
+		}
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

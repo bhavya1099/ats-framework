@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FileSystemEqualityState.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ATS-CommonLibrary</a> &gt; <a href="index.source.html" class="el_package">com.axway.ats.common.filesystem.snapshot.equality</a> &gt; <span class="el_source">FileSystemEqualityState.java</span></div><h1>FileSystemEqualityState.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2017 Axway Software
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.axway.ats.common.filesystem.snapshot.equality;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.axway.ats.common.PublicAtsApi;
+
+/**
+ * This structure can say how equal the snapshots are
+ */
+@PublicAtsApi
+public class FileSystemEqualityState implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	private String firstSnapshotName;
+
+	private String secondSnapshotName;
+
+	// list of different files
+	private List&lt;FileTrace&gt; differences;
+
+	// remember the agent addresses, there are cases we need them
+	private String firstAtsAgent;
+
+	private String secondAtsAgent;
+
+<span class="nc" id="L48">	public FileSystemEqualityState(String firstSnapshotName, String secondSnapshotName) {</span>
+
+<span class="nc" id="L50">		this.firstSnapshotName = firstSnapshotName;</span>
+<span class="nc" id="L51">		this.secondSnapshotName = secondSnapshotName;</span>
+
+<span class="nc" id="L53">		differences = new ArrayList&lt;FileTrace&gt;();</span>
+<span class="nc" id="L54">	}</span>
+
+	/**
+	 * @return the name of the first snapshot
+	 */
+	@PublicAtsApi
+	public String getFirstSnapshotName() {
+
+<span class="nc" id="L62">		return firstSnapshotName;</span>
+	}
+
+	/**
+	 * @return the name of the second snapshot
+	 */
+	@PublicAtsApi
+	public String getSecondSnapshotName() {
+
+<span class="nc" id="L71">		return secondSnapshotName;</span>
+	}
+
+	/**
+	 * @return list of differences sorted by their type
+	 */
+	@PublicAtsApi
+	public List&lt;FileTrace&gt; getDifferences() {
+
+<span class="nc" id="L80">		Collections.sort(differences, new Comparator&lt;FileTrace&gt;() {</span>
+			@Override
+			public int compare(FileTrace trace1, FileTrace trace2) {
+
+<span class="nc" id="L84">				return trace1.getDifferenceType().toInt() - trace2.getDifferenceType().toInt();</span>
+			}
+		});
+
+<span class="nc" id="L88">		return differences;</span>
+	}
+
+	/**
+	 * Create and return a map that holds differences from files presented in both
+	 * snapshots &lt;div&gt;EXAMPLE:
+	 * &lt;p&gt;
+	 * {
+	 * &lt;/p&gt;
+	 * &lt;p&gt;
+	 * &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Presence of common.testboxes.client : {snap1 : YES, snap2 :
+	 * NO},
+	 * &lt;/p&gt;
+	 * &lt;p&gt;
+	 * &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;property key 'common.testboxes.client' : {snap1 : AAA,
+	 * snap2 : BBB},
+	 * &lt;/p&gt;
+	 * &lt;p&gt;
+	 * &amp;nbsp;&amp;nbsp;&amp;nbsp;&amp;nbsp;Section [languages], key '00A' : {snap1: 'English', snap1:
+	 * 'Spanish'}
+	 * &lt;/p&gt;
+	 * &lt;p&gt;
+	 * }
+	 * &lt;/p&gt;
+	 * &lt;/div&gt;
+	 * @return map that holds the differences
+	 */
+
+	@PublicAtsApi
+	public Map&lt;String, Map&lt;String, String&gt;&gt; getFilesDifferences() {
+
+<span class="nc" id="L119">		Map&lt;String, Map&lt;String, String&gt;&gt; differencesMap = new HashMap&lt;&gt;();</span>
+		// iterate over each file trace object
+<span class="nc bnc" id="L121" title="All 2 branches missed.">		for (FileTrace diff : getDifferences()) {</span>
+			// get the file differences in first snapshot
+<span class="nc" id="L123">			Map&lt;String, String&gt; first = diff.getFirstSnapshotDifferencies();</span>
+			// get the file differences in second snapshot
+<span class="nc" id="L125">			Map&lt;String, String&gt; second = diff.getSecondSnapshotDifferencies();</span>
+			// iterate over each file from the first snapshot difference map
+<span class="nc bnc" id="L127" title="All 2 branches missed.">			for (Map.Entry&lt;String, String&gt; entry1 : first.entrySet()) {</span>
+				// iterate over each file from the second snapshot difference map
+<span class="nc bnc" id="L129" title="All 2 branches missed.">				for (Map.Entry&lt;String, String&gt; entry2 : second.entrySet()) {</span>
+					// check if the current two entries contains information for the same
+					// file difference
+<span class="nc bnc" id="L132" title="All 2 branches missed.">					if (entry1.getKey().equals(entry2.getKey())) {</span>
+						// create map that will hold information about the status of the
+						// current difference for each snapshot
+<span class="nc" id="L135">						Map&lt;String, String&gt; snapToValueMap = new HashMap&lt;String, String&gt;();</span>
+						// put the difference value from the first snapshot to the map
+<span class="nc" id="L137">						snapToValueMap.put(getFirstSnapshotName(), entry1.getValue());</span>
+						// put the difference value from the second snapshot to the map
+<span class="nc" id="L139">						snapToValueMap.put(getSecondSnapshotName(), entry2.getValue());</span>
+						// add the whole information for the current difference to the
+						// difference map
+<span class="nc" id="L142">						differencesMap.put(entry1.getKey(), snapToValueMap);</span>
+					}
+<span class="nc" id="L144">				}</span>
+<span class="nc" id="L145">			}</span>
+<span class="nc" id="L146">		}</span>
+
+<span class="nc" id="L148">		return differencesMap;</span>
+	}
+
+	public void addDifference(FileTrace difference) {
+
+<span class="nc" id="L153">		differences.add(difference);</span>
+<span class="nc" id="L154">	}</span>
+
+	public String getFirstAtsAgent() {
+
+<span class="nc" id="L158">		return firstAtsAgent;</span>
+	}
+
+	public void setFirstAtsAgent(String firstAtsAgent) {
+
+<span class="nc" id="L163">		this.firstAtsAgent = firstAtsAgent;</span>
+<span class="nc" id="L164">	}</span>
+
+	public String getSecondAtsAgent() {
+
+<span class="nc" id="L168">		return secondAtsAgent;</span>
+	}
+
+	public void setSecondAtsAgent(String secondAtsAgent) {
+
+<span class="nc" id="L173">		this.secondAtsAgent = secondAtsAgent;</span>
+<span class="nc" id="L174">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

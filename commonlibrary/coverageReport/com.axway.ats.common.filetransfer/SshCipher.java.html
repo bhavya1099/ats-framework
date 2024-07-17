@@ -1,0 +1,285 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SshCipher.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ATS-CommonLibrary</a> &gt; <a href="index.source.html" class="el_package">com.axway.ats.common.filetransfer</a> &gt; <span class="el_source">SshCipher.java</span></div><h1>SshCipher.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2017 Axway Software
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.axway.ats.common.filetransfer;
+
+import java.io.Serializable;
+
+import com.axway.ats.common.PublicAtsApi;
+
+/**
+ * This class describes an SSH Cipher. Currently used in SftpClient.&lt;br&gt;
+ * It contains some public constants of the frequently used ciphers (predefined
+ * {@link SshCipher} instances).
+ */
+@PublicAtsApi
+public class SshCipher implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	// a long list of SSH/SFTP supported ciphers could be found in a JceEncryptions class
+
+	@PublicAtsApi
+<span class="nc" id="L35">	public static final SshCipher AES128_CBC = new SshCipher(&quot;aes128-cbc&quot;, &quot;AES/CBC/NoPadding&quot;, &quot;BC&quot;, 16, 16);</span>
+
+	@PublicAtsApi
+<span class="nc" id="L38">	public static final SshCipher AES192_CBC = new SshCipher(&quot;aes192-cbc&quot;, &quot;AES/CBC/NoPadding&quot;, &quot;BC&quot;, 16, 24);</span>
+
+	@PublicAtsApi
+<span class="nc" id="L41">	public static final SshCipher AES256_CBC = new SshCipher(&quot;aes256-cbc&quot;, &quot;AES/CBC/NoPadding&quot;, &quot;BC&quot;, 16, 32);</span>
+
+	@PublicAtsApi
+<span class="nc" id="L44">	public static final SshCipher AES128_CTR = new SshCipher(&quot;aes128-ctr&quot;, &quot;AES/CTR/NoPadding&quot;, &quot;BC&quot;, 16, 16);</span>
+
+	@PublicAtsApi
+<span class="nc" id="L47">	public static final SshCipher AES192_CTR = new SshCipher(&quot;aes192-ctr&quot;, &quot;AES/CTR/NoPadding&quot;, &quot;BC&quot;, 16, 24);</span>
+
+	@PublicAtsApi
+<span class="nc" id="L50">	public static final SshCipher AES256_CTR = new SshCipher(&quot;aes256-ctr&quot;, &quot;AES/CTR/NoPadding&quot;, &quot;BC&quot;, 16, 32);</span>
+
+	@PublicAtsApi
+<span class="nc" id="L53">	public static final SshCipher _3DES_CBC = new SshCipher(&quot;3des-cbc&quot;, &quot;DESede/CBC/NoPadding&quot;, null, null, 8, 24);</span>
+
+	@PublicAtsApi
+<span class="nc" id="L56">	public static final SshCipher BLOWFISH_CBC = new SshCipher(&quot;blowfish-cbc&quot;, &quot;Blowfish/CBC/NoPadding&quot;, null, null, 8,</span>
+			16);
+
+	@PublicAtsApi
+<span class="nc" id="L60">	public static final SshCipher ARCFOUR128 = new SshCipher(&quot;arcfour128&quot;, &quot;Arcfour/CBC/NoPadding&quot;, &quot;BC&quot;, 8, 16);</span>
+
+	@PublicAtsApi
+<span class="nc" id="L63">	public static final SshCipher ARCFOUR256 = new SshCipher(&quot;arcfour256&quot;, &quot;Arcfour/CBC/NoPadding&quot;, &quot;BC&quot;, 8, 32);</span>
+
+	/**
+	 * Check currently defined ciphers here (SSH RFC4253, [Page 10]):
+	 * http://www.ietf.org/rfc/rfc4253.txt &lt;br&gt;
+	 * eg: 3des-cbc, blowfish-cbc, twofish256-cbc, aes256-cbc, aes192-cbc, aes128-cbc...
+	 *
+	 */
+	private String sshAlgorithmName;
+
+	/**
+	 * &lt;pre&gt;
+	 * Java Cryptographic Extension (JCE) describe ciphers with transformation names.
+	 * A transformation name is a string that describes the operation (or set of operations) to be performed on
+	 * the given input to produce some output. A transformation always includes the name of a cryptographic algorithm
+	 * (eg. DES), and may be followed by a mode and padding scheme.
+	 *   &quot;algorithm/mode/padding&quot; or just &quot;algorithm&quot;
+	 * For example, the following are valid transformations:
+	 *   &quot;DES/CBC/PKCS5Padding&quot;, &quot;DES&quot;, &quot;AES/CBC/NoPadding&quot;, &quot;AES&quot;
+	 *
+	 * Check here (Java7): http://docs.oracle.com/javase/7/docs/technotes/guides/security/StandardNames.html#Cipher
+	 * &lt;/pre&gt;
+	 */
+	private String jceAlgorithmName;
+
+	/**
+	 * The JCE provider name&lt;br&gt;
+	 * For example &quot;BC&quot; for BouncyCastle or null for the default Sun provider
+	 */
+	public String provider;
+
+	/**
+	 * The cipher block length in bytes
+	 */
+	public int blockLength;
+
+	/**
+	 * The algorithm key length in bytes
+	 */
+	private int keyLength;
+
+	/**
+	 * The Class that is implementing the current cipher. Can be skipped if the provider
+	 * can handle that step directly.&lt;br&gt;
+	 * Basically if something fails, you can try setting this property.
+	 */
+	private Class&lt;?&gt; implClass;
+
+	/**
+	 * @param sshAlgorithmName the SSH algorithm name
+	 * @param jceAlgorithmName the JCE algorithm name
+	 * @param blockLength the cipher block length in bytes
+	 * @param keyLength the algorithm key length in bytes
+	 */
+	@PublicAtsApi
+	public SshCipher(String sshAlgorithmName, String jceAlgorithmName, int blockLength, int keyLength) {
+
+<span class="nc" id="L120">		this(sshAlgorithmName, jceAlgorithmName, null, null, blockLength, keyLength);</span>
+<span class="nc" id="L121">	}</span>
+
+	/**
+	 * @param sshAlgorithmName the SSH algorithm name
+	 * @param jceAlgorithmName the JCE algorithm name
+	 * @param implClass the Class that implements the cipher
+	 * @param blockLength the cipher block length in bytes
+	 * @param keyLength the algorithm key length in bytes
+	 */
+	@PublicAtsApi
+	public SshCipher(String sshAlgorithmName, String jceAlgorithmName, Class&lt;?&gt; implClass, int blockLength,
+			int keyLength) {
+
+<span class="nc" id="L134">		this(sshAlgorithmName, jceAlgorithmName, null, implClass, blockLength, keyLength);</span>
+<span class="nc" id="L135">	}</span>
+
+	/**
+	 * @param sshAlgorithmName the SSH algorithm name
+	 * @param jceAlgorithmName the JCE algorithm name
+	 * @param provider the JCE provider name
+	 * @param blockLength the cipher block length in bytes
+	 * @param keyLength the algorithm key length in bytes
+	 */
+	@PublicAtsApi
+	public SshCipher(String sshAlgorithmName, String jceAlgorithmName, String provider, int blockLength,
+			int keyLength) {
+
+<span class="nc" id="L148">		this(sshAlgorithmName, jceAlgorithmName, provider, null, blockLength, keyLength);</span>
+<span class="nc" id="L149">	}</span>
+
+	/**
+	 * @param sshAlgorithmName the SSH algorithm name
+	 * @param jceAlgorithmName the JCE algorithm name
+	 * @param provider the JCE provider name
+	 * @param implClass the Class that implements the cipher
+	 * @param blockLength the cipher block length in bytes
+	 * @param keyLength the algorithm key length in bytes
+	 */
+	@PublicAtsApi
+	public SshCipher(String sshAlgorithmName, String jceAlgorithmName, String provider, Class&lt;?&gt; implClass,
+<span class="nc" id="L161">			int blockLength, int keyLength) {</span>
+
+<span class="nc" id="L163">		this.sshAlgorithmName = sshAlgorithmName;</span>
+<span class="nc" id="L164">		this.jceAlgorithmName = jceAlgorithmName;</span>
+<span class="nc" id="L165">		this.provider = provider;</span>
+<span class="nc" id="L166">		this.blockLength = blockLength;</span>
+<span class="nc" id="L167">		this.keyLength = keyLength;</span>
+<span class="nc" id="L168">	}</span>
+
+	/**
+	 * @return the SSH algorithm name
+	 */
+	@PublicAtsApi
+	public String getSshAlgorithmName() {
+
+<span class="nc" id="L176">		return sshAlgorithmName;</span>
+	}
+
+	/**
+	 * @return the JCE algorithm name
+	 */
+	@PublicAtsApi
+	public String getJceAlgorithmName() {
+
+<span class="nc" id="L185">		return jceAlgorithmName;</span>
+	}
+
+	/**
+	 * @return the JCE provider name
+	 */
+	@PublicAtsApi
+	public String getProvider() {
+
+<span class="nc" id="L194">		return provider;</span>
+	}
+
+	/**
+	 * @return the cipher block length in bytes
+	 */
+	@PublicAtsApi
+	public int getBlockLength() {
+
+<span class="nc" id="L203">		return blockLength;</span>
+	}
+
+	/**
+	 * @return the key length in bytes
+	 */
+	@PublicAtsApi
+	public int getKeyLength() {
+
+<span class="nc" id="L212">		return keyLength;</span>
+	}
+
+	/**
+	 * @return the implementation class
+	 */
+	@PublicAtsApi
+	public Class&lt;?&gt; getImplClass() {
+
+<span class="nc" id="L221">		return implClass;</span>
+	}
+
+	/**
+	 * @param sshAlgorithmName SSH algorithm name
+	 */
+	@PublicAtsApi
+	public void setSshAlgorithmName(String sshAlgorithmName) {
+
+<span class="nc" id="L230">		this.sshAlgorithmName = sshAlgorithmName;</span>
+<span class="nc" id="L231">	}</span>
+
+	/**
+	 * @param jceAlgorithmName JCE algorithm name
+	 */
+	@PublicAtsApi
+	public void setJceAlgorithmName(String jceAlgorithmName) {
+
+<span class="nc" id="L239">		this.jceAlgorithmName = jceAlgorithmName;</span>
+<span class="nc" id="L240">	}</span>
+
+	/**
+	 * @param provider the JCE provider name
+	 */
+	@PublicAtsApi
+	public void setProvider(String provider) {
+
+<span class="nc" id="L248">		this.provider = provider;</span>
+<span class="nc" id="L249">	}</span>
+
+	/**
+	 * @param blockLength the cipher block length in bytes
+	 */
+	@PublicAtsApi
+	public void setBlockLength(int blockLength) {
+
+<span class="nc" id="L257">		this.blockLength = blockLength;</span>
+<span class="nc" id="L258">	}</span>
+
+	/**
+	 * @param keyLength the key length in bytes
+	 */
+	@PublicAtsApi
+	public void setKeyLength(int keyLength) {
+
+<span class="nc" id="L266">		this.keyLength = keyLength;</span>
+<span class="nc" id="L267">	}</span>
+
+	/**
+	 * @param implClass the implementation class
+	 */
+	@PublicAtsApi
+	public void setImplClass(Class&lt;?&gt; implClass) {
+
+<span class="nc" id="L275">		this.implClass = implClass;</span>
+<span class="nc" id="L276">	}</span>
+
+	@Override
+	public String toString() {
+
+<span class="nc" id="L281">		return sshAlgorithmName + &quot; (&quot; + jceAlgorithmName + &quot;, &quot; + keyLength + &quot; bytes)&quot;;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

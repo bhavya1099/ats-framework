@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>DatabaseSnapshotUtils.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ATS-CommonLibrary</a> &gt; <a href="index.source.html" class="el_package">com.axway.ats.common.dbaccess.snapshot</a> &gt; <span class="el_source">DatabaseSnapshotUtils.java</span></div><h1>DatabaseSnapshotUtils.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2017 Axway Software
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.axway.ats.common.dbaccess.snapshot;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
+<span class="nc" id="L27">public class DatabaseSnapshotUtils {</span>
+
+<span class="nc" id="L29">	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(&quot;yyyy-MM-dd HH:mm:ss.SSSZ&quot;);</span>
+
+	// XML nodes used when saving/loading snapshots from files
+	public static final String NODE_DB_SNAPSHOT = &quot;DB_SNAPSHOT&quot;;
+
+	public static final String ATTR_SNAPSHOT_NAME = &quot;name&quot;;
+
+	public static final String ATTR_METADATA_TIME = &quot;metadata_timestamp&quot;;
+
+	public static final String ATTR_CONTENT_TIME = &quot;content_timestamp&quot;;
+
+	public static final String NODE_TABLE = &quot;TABLE&quot;;
+
+	public static final String ATTR_TABLE_NAME = &quot;name&quot;;
+
+	public static final String ATTR_TABLE_PRIMARY_KEY = &quot;primaryKey&quot;;
+
+	public static final String ATTR_TABLE_NUMBER_ROWS = &quot;numberRows&quot;;
+
+	public static final String NODE_SKIP_CONTENT = &quot;SKIP_CONTENT&quot;;
+
+	public static final String NODE_SKIP_COLUMNS = &quot;SKIP_COLUMNS&quot;;
+
+	public static final String NODE_SKIP_ROWS = &quot;SKIP_ROWS&quot;;
+
+	public static final String NODE_SKIP_INDEX_ATTRIBUTES = &quot;SKIP_INDEX_ATTRIBUTES&quot;;
+
+	public static final String ATT_SKIP_RULE_TABLE = &quot;table&quot;;
+
+	public static final String NODE_COLUMN_DESCRIPTIONS = &quot;column_descriptions&quot;;
+
+	public static final String NODE_COLUMN_DESCRIPTION = &quot;column_description&quot;;
+
+	public static final String NODE_INDEXES = &quot;indexes&quot;;
+
+	public static final String NODE_INDEX = &quot;index&quot;;
+
+	public static final String ATTR_NODE_INDEX_UID = &quot;uid&quot;;
+
+	public static final String NODE_ROW = &quot;row&quot;;
+
+	public static String dateToString(long timeInMillis) {
+
+<span class="nc" id="L72">		return DATE_FORMAT.format(new Date(timeInMillis));</span>
+	}
+
+	public static long stringToDate(String timeString) {
+
+		try {
+<span class="nc" id="L78">			return DATE_FORMAT.parse(timeString).getTime();</span>
+		}
+<span class="nc" id="L80">		catch (ParseException e) {</span>
+<span class="nc" id="L81">			throw new DatabaseSnapshotException(&quot;Cannot parse date '&quot; + timeString + &quot;'&quot;);</span>
+		}
+	}
+
+	public static List&lt;Element&gt; getChildrenByTagName(Node parent, String name) {
+
+<span class="nc" id="L87">		List&lt;Element&gt; nodeList = new ArrayList&lt;Element&gt;();</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">		for (Node child = parent.getFirstChild(); child != null; child = child.getNextSibling()) {</span>
+<span class="nc bnc" id="L89" title="All 4 branches missed.">			if (child.getNodeType() == Node.ELEMENT_NODE &amp;&amp; name.equals(child.getNodeName())) {</span>
+<span class="nc" id="L90">				nodeList.add((Element) child);</span>
+			}
+		}
+
+<span class="nc" id="L94">		return nodeList;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

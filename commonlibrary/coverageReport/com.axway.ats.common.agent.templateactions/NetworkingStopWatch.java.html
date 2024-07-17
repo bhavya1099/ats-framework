@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NetworkingStopWatch.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ATS-CommonLibrary</a> &gt; <a href="index.source.html" class="el_package">com.axway.ats.common.agent.templateactions</a> &gt; <span class="el_source">NetworkingStopWatch.java</span></div><h1>NetworkingStopWatch.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2017 Axway Software
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.axway.ats.common.agent.templateactions;
+
+import org.apache.commons.lang3.time.StopWatch;
+import org.apache.log4j.Logger;
+
+/**
+ * Tracks network(and server) times during execution of template actions. Wraps state
+ * transitions &lt;pre&gt;
+ * 0. setNewContext - phase0
+ *  1. Sending request
+ *  1.1. 1st measure: urlConnection.getOutputStream(): Open connection for - resume and suspend NET timer (on 2-3 places - plain HTTP request and AMF ones)
+ *     step1_start
+ *     step2_end
+ *  1.2. 2nd real data: resume &amp;amp; suspend NET timer
+ *     step3_start
+ *     step4_end
+ *  1.3. Store request time
+ *
+ * 2. Intermediate timer - for non-data actions after sending request and before asking for response data.
+ * Primarily for new XML Document creation...
+ *  2.1. Start right after request is sent (interim, 1)
+ *     step5_
+ * 3. Get response
+ *   3.1.1 Get response code - suspend interm. timer and resume NET time; After get - resume back to interim. timer. (interim, 2)
+ *     step6_start
+ *     step7_end
+ *   3.1.2  Get response data - stop interim timer and start NET timer. At the end stop NET timer.
+ *     step8_start
+ *     step9_end
+ *  Note: For HTTP get response code and body are on same place so no interim timer resume.
+ * &lt;/pre&gt;
+ *
+ *
+ */
+public class NetworkingStopWatch {
+
+	public static final String netTimeLoggerStr = &quot;com.axway.ats.common.agent.templateactions.wireTimer&quot;;
+
+<span class="nc" id="L54">	public static final Logger logTimer = Logger.getLogger(netTimeLoggerStr);</span>
+
+	/**
+	 * Timer for network IO including possible server processing time
+	 */
+	private StopWatch timerNetAndServerProcessingTime;
+
+	/**
+	 * Agent processing time. Works between request end and response start.
+	 */
+	private StopWatch timerBetweenReqAndResp;
+
+<span class="nc" id="L66">	int currentActionStepNumber = 0;</span>
+
+	private String currentActionName;
+
+<span class="nc" id="L70">	public NetworkingStopWatch(String templateActionName) {</span>
+
+<span class="nc" id="L72">		timerNetAndServerProcessingTime = new StopWatch();</span>
+<span class="nc" id="L73">		timerBetweenReqAndResp = new StopWatch();</span>
+<span class="nc" id="L74">		currentActionName = templateActionName;</span>
+<span class="nc" id="L75">	}</span>
+
+	public long getNetworkingTime() {
+
+<span class="nc" id="L79">		return timerNetAndServerProcessingTime.getTime();</span>
+
+	}
+
+	public long getTimeBetweenReqAndResponse() {
+
+<span class="nc" id="L85">		return timerBetweenReqAndResp.getTime();</span>
+
+	}
+
+	/**
+	 * METHODS FOR CHANGING COMMUNICATION PHASES
+	 */
+
+	/**
+	 * Reset context for timer reuse. Starting new request/response
+	 * @param actionNameStepWithNumber
+	 */
+	public void step0_SetNewContext(String actionNameStepWithNumber) {
+
+<span class="nc bnc" id="L99" title="All 2 branches missed.">		if (logTimer.isTraceEnabled()) {</span>
+<span class="nc" id="L100">			logTimer.trace(&quot;Starting new step &quot; + actionNameStepWithNumber + &quot; and reset timers&quot;);</span>
+		}
+<span class="nc" id="L102">		currentActionName = actionNameStepWithNumber;</span>
+<span class="nc" id="L103">		timerNetAndServerProcessingTime.reset();</span>
+<span class="nc" id="L104">		timerBetweenReqAndResp.reset();</span>
+<span class="nc" id="L105">	}</span>
+
+	public void step1_OpenConnectionForRequest() {
+
+<span class="nc" id="L109">		timerNetAndServerProcessingTime.start();</span>
+<span class="nc" id="L110">	}</span>
+
+	public void step2_OpenedConnectionForRequest() {
+
+<span class="nc" id="L114">		timerNetAndServerProcessingTime.suspend();</span>
+<span class="nc" id="L115">	}</span>
+
+	public void step3_StartSendingRequest() {
+
+<span class="nc" id="L119">		timerNetAndServerProcessingTime.resume();</span>
+
+<span class="nc" id="L121">	}</span>
+
+	public void step4_EndSendingRequest() {
+
+<span class="nc" id="L125">		timerNetAndServerProcessingTime.suspend();</span>
+
+<span class="nc" id="L127">	}</span>
+
+	/**
+	 * Set internal state from initial state (after step 0, before request) to state after
+	 * step 4 (request data sent)
+	 */
+	public void setStateFromBeforeStep1ToAfterStep4() {
+
+<span class="nc" id="L135">		timerNetAndServerProcessingTime.start();</span>
+<span class="nc" id="L136">		timerNetAndServerProcessingTime.suspend();</span>
+<span class="nc bnc" id="L137" title="All 2 branches missed.">		if (timerNetAndServerProcessingTime.getTime() &gt; 20) { // if start/suspend delay is</span>
+																// relatively big
+<span class="nc" id="L139">			logTimer.warn(&quot;Due to thread delay network timer intially starts with &quot;</span>
+<span class="nc" id="L140">					+ timerNetAndServerProcessingTime.getTime() + &quot;ms more. Probably the system is too much loaded.&quot;);</span>
+		}
+<span class="nc" id="L142">	}</span>
+
+	/**
+	 * Start timer for work between end of request and begin to ask for response data
+	 */
+	public void step5_StartInterimTimer() {
+
+<span class="nc bnc" id="L149" title="All 2 branches missed.">		if (logTimer.isTraceEnabled()) {</span>
+<span class="nc" id="L150">			logTimer.trace(&quot;This action step &quot; + currentActionName + &quot; request network time took &quot;</span>
+<span class="nc" id="L151">					+ timerNetAndServerProcessingTime.getTime() + &quot; ms&quot;);</span>
+		}
+<span class="nc" id="L153">		timerBetweenReqAndResp.reset();</span>
+<span class="nc" id="L154">		timerBetweenReqAndResp.start();</span>
+<span class="nc" id="L155">	}</span>
+
+	public void step6_StartGetResponseCode() {
+
+<span class="nc" id="L159">		timerBetweenReqAndResp.suspend();</span>
+<span class="nc" id="L160">		timerNetAndServerProcessingTime.resume();</span>
+<span class="nc" id="L161">	}</span>
+
+	/**
+	 * End get response code and resume back interim timer
+	 */
+	public void step7_EndGetResponseCode() {
+
+<span class="nc" id="L168">		timerNetAndServerProcessingTime.suspend();</span>
+<span class="nc" id="L169">		timerBetweenReqAndResp.resume();</span>
+<span class="nc" id="L170">	}</span>
+
+	/**
+	 * Stop timer between req. and resp. and resume timer for getting net data
+	 */
+	public void step8_stopInterimTimeAndStartReceivingResponseData() {
+
+<span class="nc" id="L177">		timerBetweenReqAndResp.stop();</span>
+<span class="nc" id="L178">		timerNetAndServerProcessingTime.resume();</span>
+
+<span class="nc" id="L180">	}</span>
+
+	public void step9_endReceivingResponseData() {
+
+<span class="nc" id="L184">		timerNetAndServerProcessingTime.stop();</span>
+
+<span class="nc" id="L186">	}</span>
+
+	/**
+	 * Return used StopWatch for network. &lt;br&gt;
+	 * &lt;em&gt;Note:&lt;/em&gt; To be used only to pass StopWatch to Common library methods to
+	 * serialize objects to AMF stream.
+	 * @return StopWatch
+	 */
+	public StopWatch getNetTimer() {
+
+<span class="nc" id="L196">		return timerNetAndServerProcessingTime;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
