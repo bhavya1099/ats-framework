@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MimeTypeFileExtensionMapper.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ATS-CommonLibrary</a> &gt; <a href="index.source.html" class="el_package">com.axway.ats.common.io</a> &gt; <span class="el_source">MimeTypeFileExtensionMapper.java</span></div><h1>MimeTypeFileExtensionMapper.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2017 Axway Software
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.axway.ats.common.io;
+
+import java.util.Properties;
+
+import org.apache.log4j.Logger;
+
+<span class="nc" id="L22">public class MimeTypeFileExtensionMapper {</span>
+
+<span class="nc" id="L24">	private final static Logger log = Logger.getLogger(MimeTypeFileExtensionMapper.class);</span>
+
+	public final static String GZIP_CONTENT_ENCODING = &quot;gzip&quot;;
+
+	public final static String GZIP_FILE_EXTENSION = &quot;gzip&quot;;
+
+<span class="nc" id="L30">	private final static Properties contentTypeFileExtProps = new Properties() {</span>
+		private static final long serialVersionUID = 1L;
+
+		{
+			try {
+<span class="nc" id="L35">				loadFromXML(MimeTypeFileExtensionMapper.class.getResourceAsStream(&quot;MimeTypeFileExtensionMapper.xml&quot;));</span>
+			}
+<span class="nc" id="L37">			catch (Exception e) {</span>
+<span class="nc" id="L38">				log.error(&quot;Could not load file with mime types to files extension mappings&quot;, e);</span>
+<span class="nc" id="L39">			}</span>
+<span class="nc" id="L40">		}</span>
+	};
+
+	public static String getFileExtension(String contentType) {
+
+<span class="nc" id="L45">		return getFileExtension(contentType, null);</span>
+	}
+
+	public static String getFileExtension(String contentType, String contentEncoding) {
+
+<span class="nc bnc" id="L50" title="All 2 branches missed.">		if (contentType == null) {</span>
+<span class="nc" id="L51">			return null;</span>
+		}
+<span class="nc" id="L53">		int columnIdx = contentType.indexOf(';');</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">		if (columnIdx &gt; 0) {</span>
+<span class="nc" id="L55">			contentType = contentType.substring(0, columnIdx).trim().toLowerCase();</span>
+		}
+		else {
+<span class="nc" id="L58">			contentType = contentType.toLowerCase();</span>
+		}
+<span class="nc bnc" id="L60" title="All 2 branches missed.">		contentEncoding = (contentEncoding != null) ? contentEncoding.toLowerCase() : null;</span>
+<span class="nc" id="L61">		String fileExt = contentTypeFileExtProps.getProperty(contentType);</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">		if (fileExt == null) {</span>
+<span class="nc" id="L63">			return null;</span>
+		}
+<span class="nc" id="L65">		StringBuilder resultStr = new StringBuilder(fileExt);</span>
+<span class="nc bnc" id="L66" title="All 2 branches missed.">		if (GZIP_CONTENT_ENCODING.equals(contentEncoding)) {</span>
+<span class="nc" id="L67">			resultStr.append(&quot;.&quot;);</span>
+<span class="nc" id="L68">			resultStr.append(GZIP_FILE_EXTENSION);</span>
+		}
+<span class="nc" id="L70">		return resultStr.toString();</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SharedReadingBean.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ATS-CommonLibrary</a> &gt; <a href="index.source.html" class="el_package">com.axway.ats.common.performance.monitor.beans</a> &gt; <span class="el_source">SharedReadingBean.java</span></div><h1>SharedReadingBean.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2017 Axway Software
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.axway.ats.common.performance.monitor.beans;
+
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.util.Locale;
+
+import org.apache.log4j.Logger;
+
+/**
+ * Shares some data between different reading types.
+ */
+public class SharedReadingBean extends ReadingBean {
+
+	private static final long serialVersionUID = 1L;
+
+<span class="nc" id="L31">	private Logger log = Logger.getLogger(this.getClass());</span>
+
+	// format the given float CPU usage values, output 4 digits after decimal point
+	// which are later multiplied by 100
+	private static final DecimalFormat CPU_USAGE_FORMATTER;
+	static {
+<span class="nc" id="L37">		CPU_USAGE_FORMATTER = new DecimalFormat(&quot;#.####&quot;);</span>
+<span class="nc" id="L38">		CPU_USAGE_FORMATTER.setDecimalFormatSymbols(new DecimalFormatSymbols(Locale.US));</span>
+<span class="nc" id="L39">	}</span>
+
+	private static final byte MAX_NUMBER_LOGGED_WARNINGS = 10;
+
+<span class="nc" id="L43">	private byte loggedWarnings = 0;</span>
+
+	protected float normalizationFactor;
+
+	public SharedReadingBean(String monitorClass, String name, String unit, float normalizationFactor) {
+
+<span class="nc" id="L49">		super(monitorClass, name, unit);</span>
+
+<span class="nc" id="L51">		this.normalizationFactor = normalizationFactor;</span>
+<span class="nc" id="L52">	}</span>
+
+	/**
+	 * Invalid double values set to &quot;-1.0&quot;
+	 * @param value double value
+	 * @return the double value if it is &amp;gt;= 0 and is not NaN or Infinite, else returns
+	 * -1
+	 */
+	protected double fixDoubleValue(double value) {
+
+<span class="nc bnc" id="L62" title="All 6 branches missed.">		if (Double.isNaN(value) || Double.isInfinite(value) || value &lt; 0.0D) {</span>
+<span class="nc" id="L63">			logWarning(&quot;Invalid value for &quot; + getName() + &quot; [expected a value &gt;= 0]: &quot; + value);</span>
+<span class="nc" id="L64">			return -1.0D;</span>
+		}
+		else {
+<span class="nc" id="L67">			loggedWarnings = 0; // reset logged warnings counter</span>
+<span class="nc" id="L68">			return value;</span>
+		}
+	}
+
+	/**
+	 * Invalid double percent values set to &quot;-0.01&quot;
+	 * @param value double value
+	 * @return the double value if it is &amp;gt;= 0 and is not NaN or Infinite, else returns
+	 * -0.01
+	 */
+	protected float fixDoubleValueInPercents(double value) {
+
+<span class="nc bnc" id="L80" title="All 6 branches missed.">		if (Double.isNaN(value) || Double.isInfinite(value) || value &lt; 0.0D) {</span>
+<span class="nc" id="L81">			logWarning(&quot;Invalid value for &quot; + getName() + &quot; [expected a value in range 0.0 - 100.0]: &quot; + value);</span>
+<span class="nc" id="L82">			return -0.01F;</span>
+		}
+		else {
+<span class="nc" id="L85">			loggedWarnings = 0; // reset logged warnings counter</span>
+<span class="nc" id="L86">			return Float.parseFloat(CPU_USAGE_FORMATTER.format(value)) * normalizationFactor;</span>
+		}
+	}
+
+	/**
+	 * Negative long values set to &quot;-1&quot;
+	 * @param value long value
+	 * @return the long value if it is &amp;gt;= 0, else returns -1
+	 */
+	protected long fixLongValue(long value) {
+
+<span class="nc bnc" id="L97" title="All 2 branches missed.">		if (value &lt; 0L) {</span>
+<span class="nc" id="L98">			logWarning(&quot;Invalid value for &quot; + getName() + &quot; [expected value &gt;= 0]: &quot; + value);</span>
+<span class="nc" id="L99">			return -1L;</span>
+		}
+		else {
+<span class="nc" id="L102">			loggedWarnings = 0; // reset logged warnings counter</span>
+<span class="nc" id="L103">			return value;</span>
+		}
+	}
+
+	/**
+	 * @param warnMessage warning message
+	 */
+	private void logWarning(String warnMessage) {
+
+<span class="nc bnc" id="L112" title="All 2 branches missed.">		if (loggedWarnings &lt; MAX_NUMBER_LOGGED_WARNINGS) {</span>
+
+<span class="nc bnc" id="L114" title="All 2 branches missed.">			if (++loggedWarnings == MAX_NUMBER_LOGGED_WARNINGS) {</span>
+<span class="nc" id="L115">				warnMessage += &quot;\nThis is the &quot; + MAX_NUMBER_LOGGED_WARNINGS</span>
+						+ &quot;th and last time we are logging polling warning for this statistic.&quot;;
+			}
+<span class="nc" id="L118">			log.warn(warnMessage);</span>
+		}
+<span class="nc" id="L120">	}</span>
+
+	protected void applyMemoryNormalizationFactor() {
+
+<span class="nc bnc" id="L124" title="All 2 branches missed.">		if (unit.startsWith(&quot;Byte&quot;)) {</span>
+<span class="nc" id="L125">			normalizationFactor = 1.0F;</span>
+		}
+<span class="nc bnc" id="L127" title="All 2 branches missed.">		else if (unit.startsWith(&quot;KB&quot;)) {</span>
+<span class="nc" id="L128">			normalizationFactor = 1.0F / 1024.0F;</span>
+		}
+<span class="nc bnc" id="L130" title="All 2 branches missed.">		else if (unit.startsWith(&quot;MB&quot;)) {</span>
+<span class="nc" id="L131">			normalizationFactor = 1.0F / (1024.0F * 1024.0F);</span>
+		}
+		else {
+<span class="nc" id="L134">			normalizationFactor = 1.0F;</span>
+<span class="nc" id="L135">			logUnknownUnitError(name, new String[] { &quot;Byte&quot;, &quot;KB&quot;, &quot;MB&quot; }, &quot;Byte&quot;);</span>
+		}
+<span class="nc" id="L137">	}</span>
+
+	private void logUnknownUnitError(String readingName, String[] validUnits, String defaultUnit) {
+
+<span class="nc" id="L141">		StringBuilder errorMessage = new StringBuilder();</span>
+<span class="nc" id="L142">		errorMessage.append(&quot;Unknown unit for &quot;);</span>
+<span class="nc" id="L143">		errorMessage.append(readingName);</span>
+<span class="nc" id="L144">		errorMessage.append(&quot;. Valid units are [&quot;);</span>
+<span class="nc" id="L145">		boolean first = true;</span>
+<span class="nc bnc" id="L146" title="All 2 branches missed.">		for (String validUnit : validUnits) {</span>
+<span class="nc bnc" id="L147" title="All 2 branches missed.">			if (first) {</span>
+<span class="nc" id="L148">				first = false;</span>
+			}
+			else {
+<span class="nc" id="L151">				errorMessage.append(&quot;,&quot;);</span>
+			}
+<span class="nc" id="L153">			errorMessage.append(validUnit);</span>
+		}
+<span class="nc" id="L155">		errorMessage.append(&quot;]. We will use the default '&quot;);</span>
+<span class="nc" id="L156">		errorMessage.append(defaultUnit);</span>
+<span class="nc" id="L157">		errorMessage.append(&quot;'&quot;);</span>
+<span class="nc" id="L158">		log.warn(errorMessage);</span>
+<span class="nc" id="L159">	}</span>
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
