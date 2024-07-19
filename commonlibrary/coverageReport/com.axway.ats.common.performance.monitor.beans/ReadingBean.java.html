@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReadingBean.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">ATS-CommonLibrary</a> &gt; <a href="index.source.html" class="el_package">com.axway.ats.common.performance.monitor.beans</a> &gt; <span class="el_source">ReadingBean.java</span></div><h1>ReadingBean.java</h1><pre class="source lang-java linenums">/*
+ * Copyright 2017 Axway Software
+ *
+ * Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.axway.ats.common.performance.monitor.beans;
+
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+import com.axway.ats.common.PublicAtsApi;
+
+/**
+ *
+ * A full reading info.
+ *
+ * It contains all reading info.
+ *
+ */
+@PublicAtsApi
+public class ReadingBean implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	protected String monitorClass;
+
+	protected String name;
+
+	protected String unit;
+
+<span class="nc" id="L42">	protected Map&lt;String, String&gt; parameters = new HashMap&lt;String, String&gt;();</span>
+
+	/**
+	 * The id that is assigned to this ReadingBean from the ReadingsRepository
+	 */
+	protected int id;
+
+	/**
+	 * The DB id under which this reading is persisted in the logging DB. The default
+	 * value is -1, which means that this ReadingBean is not populated to DB
+	 */
+<span class="nc" id="L53">	protected int dbId = -1;</span>
+
+	protected boolean dynamicReading;
+
+	/**
+	 * The bean value
+	 */
+	protected String value;
+
+	@PublicAtsApi
+<span class="nc" id="L63">	public ReadingBean() {</span>
+
+<span class="nc" id="L65">	}</span>
+
+	@PublicAtsApi
+<span class="nc" id="L68">	public ReadingBean(String monitorClass, String name, String unit) {</span>
+
+<span class="nc" id="L70">		this.monitorClass = monitorClass;</span>
+<span class="nc" id="L71">		this.name = name;</span>
+<span class="nc" id="L72">		this.unit = unit;</span>
+<span class="nc" id="L73">	}</span>
+
+	public ReadingBean getNewCopy() {
+
+<span class="nc" id="L77">		ReadingBean newBean = new ReadingBean();</span>
+
+<span class="nc" id="L79">		newBean.value = this.value;</span>
+<span class="nc" id="L80">		newBean.monitorClass = this.monitorClass;</span>
+<span class="nc" id="L81">		newBean.name = this.name;</span>
+<span class="nc" id="L82">		newBean.unit = this.unit;</span>
+<span class="nc" id="L83">		newBean.parameters = this.parameters;</span>
+<span class="nc" id="L84">		newBean.dbId = this.dbId;</span>
+<span class="nc" id="L85">		newBean.id = this.id;</span>
+<span class="nc" id="L86">		newBean.dynamicReading = this.dynamicReading;</span>
+
+<span class="nc" id="L88">		return newBean;</span>
+	}
+
+	@PublicAtsApi
+	public String getMonitorName() {
+
+<span class="nc" id="L94">		return monitorClass;</span>
+	}
+
+	@PublicAtsApi
+	public String getName() {
+
+<span class="nc" id="L100">		return name;</span>
+	}
+
+	@PublicAtsApi
+	public void setName(String name) {
+
+<span class="nc" id="L106">		this.name = name;</span>
+<span class="nc" id="L107">	}</span>
+
+	@PublicAtsApi
+	public String getUnit() {
+
+<span class="nc" id="L112">		return unit;</span>
+	}
+
+	public boolean isDynamicReading() {
+
+<span class="nc" id="L117">		return dynamicReading;</span>
+	}
+
+	public void setDynamicReading(boolean dynamicReading) {
+
+<span class="nc" id="L122">		this.dynamicReading = dynamicReading;</span>
+<span class="nc" id="L123">	}</span>
+
+	public int getDbId() {
+
+<span class="nc" id="L127">		return dbId;</span>
+	}
+
+	public void setDbId(int dbId) {
+
+<span class="nc" id="L132">		this.dbId = dbId;</span>
+<span class="nc" id="L133">	}</span>
+
+	public int getId() {
+
+<span class="nc" id="L137">		return id;</span>
+	}
+
+	public void setId(int id) {
+
+<span class="nc" id="L142">		this.id = id;</span>
+<span class="nc" id="L143">	}</span>
+
+	public String getParameter(String parameterName) {
+
+<span class="nc bnc" id="L147" title="All 2 branches missed.">		if (this.parameters != null) {</span>
+<span class="nc" id="L148">			return this.parameters.get(parameterName);</span>
+		}
+		else {
+<span class="nc" id="L151">			return null;</span>
+		}
+	}
+
+	public Map&lt;String, String&gt; getParameters() {
+
+<span class="nc" id="L157">		return this.parameters;</span>
+	}
+
+	public void setParameters(Map&lt;String, String&gt; parameters) {
+
+<span class="nc" id="L162">		this.parameters = parameters;</span>
+<span class="nc" id="L163">	}</span>
+
+	@PublicAtsApi
+	public String getValue() {
+
+<span class="nc" id="L168">		return value;</span>
+	}
+
+	@PublicAtsApi
+	public void setValue(String value) {
+
+<span class="nc" id="L174">		this.value = value;</span>
+<span class="nc" id="L175">	}</span>
+
+	public String getDescription() {
+
+<span class="nc" id="L179">		return &quot;'&quot; + monitorClass + &quot;' collects the '&quot; + name + &quot;' in '&quot; + unit + &quot;' units&quot;;</span>
+	}
+
+	@Override
+	public String toString() {
+
+<span class="nc" id="L185">		return &quot;'&quot; + id + &quot;' with value '&quot; + value + &quot;'&quot;;</span>
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+
+<span class="nc bnc" id="L191" title="All 2 branches missed.">		if (obj instanceof ReadingBean) {</span>
+<span class="nc" id="L192">			ReadingBean that = (ReadingBean) obj;</span>
+<span class="nc bnc" id="L193" title="All 2 branches missed.">			if (name.equals(that.name)) {</span>
+<span class="nc bnc" id="L194" title="All 4 branches missed.">				if (parameters != null &amp;&amp; that.parameters != null</span>
+<span class="nc bnc" id="L195" title="All 2 branches missed.">						&amp;&amp; parameters.toString().equals(that.parameters.toString())) {</span>
+<span class="nc" id="L196">					return true;</span>
+				}
+			}
+		}
+<span class="nc" id="L200">		return false;</span>
+	}
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
